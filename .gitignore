@@ -1,0 +1,8 @@
+# vscode files
+.vscode
+
+# Lock excel files
+~*.xlsx
+
+# Python cache
+__pycache__

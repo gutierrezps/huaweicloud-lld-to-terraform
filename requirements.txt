@@ -1,0 +1,4 @@
+openpyxl==3.0.*
+flake8==6.0.*
+pystache==0.6.*
+tqdm==4.6.*

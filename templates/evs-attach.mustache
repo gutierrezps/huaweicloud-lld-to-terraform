@@ -1,0 +1,9 @@
+resource "huaweicloud_compute_volume_attach" "evs_{{ evs_name }}{{ shared_letter }}_attachment" {
+  instance_id = huaweicloud_compute_instance.{{ ecs_name }}.id
+  volume_id   = huaweicloud_evs_volume.evs_{{ evs_name }}.id
+  device = "{{ evs_device }}"
+  depends_on = [ {{{ depends_on }}} ]
+  timeouts {
+    create = "20m"
+  }
+}

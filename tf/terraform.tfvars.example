@@ -1,0 +1,3 @@
+hwcloud_ak = "..."
+hwcloud_sk = "..."
+hwcloud_region = "sa-brazil-1"  # LA-Sao Paulo

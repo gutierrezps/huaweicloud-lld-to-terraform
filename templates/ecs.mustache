@@ -1,0 +1,20 @@
+resource "huaweicloud_compute_instance" "{{ ecs_name }}" {
+  name                = "{{ hostname }}"
+  image_id            = "{{ image_id }}"
+  flavor_id           = "{{ flavor }}"
+  security_group_ids  = [ huaweicloud_networking_secgroup.{{ security_group }}.id ]
+  availability_zone   = "{{ az }}"
+  admin_pass          = "Huawei@1234"
+  system_disk_type    = "{{ system_disk_type }}"
+  system_disk_size    = {{ system_disk_size }}
+
+  network {
+    uuid              = huaweicloud_vpc_subnet.{{ nic1_subnet }}.id
+    fixed_ip_v4       = "{{ nic1_static_ip }}"
+    source_dest_check = {{ source_dest_check }}
+  }
+
+  tags = {
+    deployed_by   = "terraform"
+  }
+}

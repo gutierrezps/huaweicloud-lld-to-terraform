@@ -1,0 +1,11 @@
+resource "huaweicloud_evs_volume" "evs_{{ evs_name }}" {
+  name              = "{{ evs_name }}"
+  availability_zone = "{{ az }}"
+  volume_type       = "{{ type }}"
+  size              = {{ size }}
+  multiattach       = {{ shared }}
+
+  tags = {
+    deployed_by   = "terraform"
+  }
+}
