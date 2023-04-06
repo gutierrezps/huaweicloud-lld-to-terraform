@@ -21,7 +21,8 @@ def process_ecs(worksheet: Worksheet):
             print(f'[ERR] Row {row}: {error}')
             exit()
 
-    ecs_handler.output_terraform_code()
+    with open('tf/ecs.tf', 'w') as output_file:
+        ecs_handler.output_terraform_code(output_file)
 
 
 def main():

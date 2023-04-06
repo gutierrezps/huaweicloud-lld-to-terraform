@@ -1,3 +1,4 @@
+from io import TextIOWrapper
 from pystache import Renderer
 
 from .evs2terraform import Evs2Terraform
@@ -108,25 +109,24 @@ class Ecs2Terraform:
 
         return tf_code
 
-    def output_terraform_code(self):
+    def output_terraform_code(self, output_file: TextIOWrapper):
         """Transforms all ECS data into Terraform code, and save to
         tf/ecs.tf.
+
+        Args:
+            output_file (TextIOWrapper): file to write the tf code
         """
         renderer = Renderer()
-
-        tf_file = open('tf/ecs.tf', 'w')
 
         for ecs_data in self._ecs.values():
             tf_code = renderer.render_name('templates/ecs', ecs_data)
             tf_code += '\n'
-            tf_file.write(tf_code)
+            output_file.write(tf_code)
 
-        tf_file.write(self._server_groups_to_tfcode())
+        output_file.write(self._server_groups_to_tfcode())
 
         self._nics_handler.add_servergroup_deps(self._server_groups)
-        tf_file.write(self._nics_handler.terraform_code())
+        output_file.write(self._nics_handler.terraform_code())
 
         self._evs_handler.add_servergroup_deps(self._server_groups)
-        tf_file.write(self._evs_handler.terraform_code())
-
-        tf_file.close()
+        output_file.write(self._evs_handler.terraform_code())
