@@ -10,7 +10,7 @@ class Nics2Terraform:
     NIC_IDS = range(1, 9)
 
     # Mandatory parameters for a NIC
-    NIC_PARAMS = ['subnet', 'static_ip']
+    NIC_PARAMS = ['vpc', 'subnet', 'fixed_ip', 'security_group']
 
     def __init__(self):
         self.ecs_nics = {}
@@ -46,8 +46,7 @@ class Nics2Terraform:
 
     def _add_nic(self, ecs_data: dict, i_nic: int):
         nic_data = {
-            'ecs_name': ecs_data['ecs_name'],
-            'security_group': ecs_data['security_group']
+            'ecs_name': ecs_data['ecs_name']
         }
 
         params = [f'nic{ i_nic }_{p}' for p in self.NIC_PARAMS]
@@ -56,7 +55,7 @@ class Nics2Terraform:
         missing_params = set(params) - set(present_params)
 
         # if fixed IP is missing for NIC i means there's no NIC
-        if f'nic{ i_nic }_static_ip' not in present_params:
+        if f'nic{ i_nic }_fixed_ip' not in present_params:
             return
 
         # if there are some params missing, throw an error
@@ -77,7 +76,7 @@ class Nics2Terraform:
 
     def _add_virtual_ip(self, ecs_data, i_nic):
         nic_vip_key = f'nic{ i_nic }_virtual_ip'
-        nic_static_ip_key = f'nic{ i_nic }_static_ip'
+        nic_fixed_ip_key = f'nic{ i_nic }_fixed_ip'
         if nic_vip_key not in ecs_data:
             return
 
@@ -99,7 +98,7 @@ class Nics2Terraform:
                 }
 
             self.virtual_ips[vip_addr]['hosts'].append(ecs_data['ecs_name'])
-            self.ips_with_vips[ecs_data[nic_static_ip_key]] = vip_addr
+            self.ips_with_vips[ecs_data[nic_fixed_ip_key]] = vip_addr
 
     def _nics_to_tfcode(self, ecs_name, renderer):
         tf_code = ''
@@ -123,7 +122,7 @@ class Nics2Terraform:
 
             # Source/Destination Check must be disabled
             # for NICs with virtual IPs assigned
-            nic_has_vip = self.has_vip(nic_data['static_ip'])
+            nic_has_vip = self.has_vip(nic_data['fixed_ip'])
             nic_data['source_dest_check'] = str(not nic_has_vip).lower()
 
             tf_code += renderer.render_name('templates/nic', nic_data)
@@ -165,8 +164,8 @@ class Nics2Terraform:
 
         return tf_code
 
-    def has_vip(self, static_ip: str) -> bool:
-        return static_ip in self.ips_with_vips
+    def has_vip(self, fixed_ip: str) -> bool:
+        return fixed_ip in self.ips_with_vips
 
     def terraform_code(self):
         renderer = Renderer()
