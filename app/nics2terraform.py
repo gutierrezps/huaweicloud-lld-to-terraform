@@ -33,6 +33,37 @@ class Nics2Terraform:
         # key is the original IP, value is the VIP
         self.ips_with_vips = {}
 
+    def transform_params(self, ecs_data: dict) -> dict:
+        """Apply transformations to the ecs parameters.
+
+        Clean vpc, subnet and security group, to be used as resource IDs
+        in Terraform code. Also prepend vpc to subnet, because subnet
+        name can be repeated.
+
+        Args:
+            ecs_data (dict): input ecs data
+
+        Returns:
+            dict: output ecs data
+        """
+        clean_params = ['vpc', 'subnet', 'security_group']
+        for i_nic in self.NIC_IDS:
+            params = [f'nic{ i_nic }_{p}' for p in clean_params]
+            for p in params:
+                if p not in ecs_data:
+                    continue
+                ecs_data[p] = clean_str(ecs_data[p])
+
+            try:
+                subnet_name = ecs_data[f'nic{ i_nic }_vpc']
+                subnet_name += '_' + ecs_data[f'nic{ i_nic }_subnet']
+                ecs_data[f'nic{ i_nic }_subnet'] = subnet_name
+            except KeyError:
+                # nic is not defined
+                pass
+
+        return ecs_data
+
     def add_nics(self, ecs_data: dict):
         self.ecs_nics[ecs_data['ecs_name']] = []
         for i_nic in self.NIC_IDS:

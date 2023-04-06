@@ -9,7 +9,7 @@ resource "huaweicloud_compute_instance" "ecs_1_01a" {
   system_disk_size    = 50
 
   network {
-    uuid              = huaweicloud_vpc_subnet.subnet_prod_1.id
+    uuid              = huaweicloud_vpc_subnet.prod_subnet_prod_1.id
     fixed_ip_v4       = "10.1.1.10"
     source_dest_check = false
   }
@@ -30,7 +30,7 @@ resource "huaweicloud_compute_instance" "ecs_1_01b" {
   system_disk_size    = 50
 
   network {
-    uuid              = huaweicloud_vpc_subnet.subnet_prod_1.id
+    uuid              = huaweicloud_vpc_subnet.prod_subnet_prod_1.id
     fixed_ip_v4       = "10.1.1.11"
     source_dest_check = false
   }
@@ -51,7 +51,7 @@ resource "huaweicloud_compute_instance" "ecs_1_02" {
   system_disk_size    = 100
 
   network {
-    uuid              = huaweicloud_vpc_subnet.subnet_prod_1.id
+    uuid              = huaweicloud_vpc_subnet.prod_subnet_prod_1.id
     fixed_ip_v4       = "10.1.1.20"
     source_dest_check = true
   }
@@ -72,7 +72,7 @@ resource "huaweicloud_compute_instance" "ecs_1_03" {
   system_disk_size    = 100
 
   network {
-    uuid              = huaweicloud_vpc_subnet.subnet_prod_1.id
+    uuid              = huaweicloud_vpc_subnet.prod_subnet_prod_1.id
     fixed_ip_v4       = "10.1.1.21"
     source_dest_check = true
   }
@@ -82,26 +82,35 @@ resource "huaweicloud_compute_instance" "ecs_1_03" {
   }
 }
 
-resource "huaweicloud_compute_interface_attach" "nic_ecs_1_01a_subnet_sync_1" {
+resource "huaweicloud_compute_servergroup" "servergroup_group01" {
+  name     = "group01"
+  policies = ["anti-affinity"]
+  members  = [
+    huaweicloud_compute_instance.ecs_1_01a.id,
+    huaweicloud_compute_instance.ecs_1_01b.id
+  ]
+}
+
+resource "huaweicloud_compute_interface_attach" "nic_ecs_1_01a_sync_subnet_sync_1" {
   instance_id = huaweicloud_compute_instance.ecs_1_01a.id
-  network_id  = huaweicloud_vpc_subnet.subnet_sync_1.id
+  network_id  = huaweicloud_vpc_subnet.sync_subnet_sync_1.id
   fixed_ip    = "10.2.1.10"
   security_group_ids  = [ huaweicloud_networking_secgroup.sg_prod.id ]
   source_dest_check   = false
-  depends_on  = [  ]
+  depends_on  = [ huaweicloud_compute_servergroup.servergroup_group01 ]
 }
 
-resource "huaweicloud_compute_interface_attach" "nic_ecs_1_01b_subnet_sync_1" {
+resource "huaweicloud_compute_interface_attach" "nic_ecs_1_01b_sync_subnet_sync_1" {
   instance_id = huaweicloud_compute_instance.ecs_1_01b.id
-  network_id  = huaweicloud_vpc_subnet.subnet_sync_1.id
+  network_id  = huaweicloud_vpc_subnet.sync_subnet_sync_1.id
   fixed_ip    = "10.2.1.11"
   security_group_ids  = [ huaweicloud_networking_secgroup.sg_prod.id ]
   source_dest_check   = false
-  depends_on  = [  ]
+  depends_on  = [ huaweicloud_compute_servergroup.servergroup_group01 ]
 }
 
 resource "huaweicloud_networking_vip" "vip_10_1_1_12" {
-  network_id = huaweicloud_vpc_subnet.subnet_prod_1.id
+  network_id = huaweicloud_vpc_subnet.prod_subnet_prod_1.id
   ip_address = "10.1.1.12"
 }
 
@@ -114,15 +123,15 @@ resource "huaweicloud_networking_vip_associate" "vip_10_1_1_12_associate" {
 }
 
 resource "huaweicloud_networking_vip" "vip_10_2_1_12" {
-  network_id = huaweicloud_vpc_subnet.subnet_sync_1.id
+  network_id = huaweicloud_vpc_subnet.sync_subnet_sync_1.id
   ip_address = "10.2.1.12"
 }
 
 resource "huaweicloud_networking_vip_associate" "vip_10_2_1_12_associate" {
   vip_id   = huaweicloud_networking_vip.vip_10_2_1_12.id
   port_ids = [
-    split("/", huaweicloud_compute_interface_attach.nic_ecs_1_01a_subnet_sync_1.id)[1],
-    split("/", huaweicloud_compute_interface_attach.nic_ecs_1_01b_subnet_sync_1.id)[1]
+    split("/", huaweicloud_compute_interface_attach.nic_ecs_1_01a_sync_subnet_sync_1.id)[1],
+    split("/", huaweicloud_compute_interface_attach.nic_ecs_1_01b_sync_subnet_sync_1.id)[1]
   ]
 }
 
@@ -190,7 +199,7 @@ resource "huaweicloud_compute_volume_attach" "evs_ecs_1_01_data_1_shareda_attach
   instance_id = huaweicloud_compute_instance.ecs_1_01a.id
   volume_id   = huaweicloud_evs_volume.evs_ecs_1_01_data_1_shared.id
   device = "/dev/vdb"
-  depends_on = [  ]
+  depends_on = [ huaweicloud_compute_servergroup.servergroup_group01 ]
   timeouts {
     create = "20m"
   }
@@ -210,7 +219,7 @@ resource "huaweicloud_compute_volume_attach" "evs_ecs_1_01_data_1_sharedb_attach
   instance_id = huaweicloud_compute_instance.ecs_1_01b.id
   volume_id   = huaweicloud_evs_volume.evs_ecs_1_01_data_1_shared.id
   device = "/dev/vdb"
-  depends_on = [  ]
+  depends_on = [ huaweicloud_compute_servergroup.servergroup_group01 ]
   timeouts {
     create = "20m"
   }
