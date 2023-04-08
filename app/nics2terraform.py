@@ -126,6 +126,7 @@ class Nics2Terraform:
                     'name': clean_str(vip_addr),
                     'subnet': ecs_data[f'nic{ i_nic }_subnet'],
                     'ip': vip_addr,
+                    'region': ecs_data['region'],
                     'hosts': [],
                     'extension': i_nic != 1
                 }

@@ -117,26 +117,30 @@ resource "huaweicloud_compute_interface_attach" "nic_ecs_1_01b_net_net01" {
 }
 
 resource "huaweicloud_networking_vip" "vip_10_1_1_12" {
-  network_id = huaweicloud_vpc_subnet.prod_prod01.id
-  ip_address = "10.1.1.12"
+  region      = "sa-brazil-1"
+  network_id  = huaweicloud_vpc_subnet.prod_prod01.id
+  ip_address  = "10.1.1.12"
 }
 
 resource "huaweicloud_networking_vip_associate" "vip_10_1_1_12_associate" {
-  vip_id   = huaweicloud_networking_vip.vip_10_1_1_12.id
-  port_ids = [
+  region    = huaweicloud_networking_vip.vip_10_1_1_12.region
+  vip_id    = huaweicloud_networking_vip.vip_10_1_1_12.id
+  port_ids  = [
     huaweicloud_compute_instance.ecs_1_01a.network[0].port,
     huaweicloud_compute_instance.ecs_1_01b.network[0].port
   ]
 }
 
 resource "huaweicloud_networking_vip" "vip_10_2_1_12" {
-  network_id = huaweicloud_vpc_subnet.net_net01.id
-  ip_address = "10.2.1.12"
+  region      = "sa-brazil-1"
+  network_id  = huaweicloud_vpc_subnet.net_net01.id
+  ip_address  = "10.2.1.12"
 }
 
 resource "huaweicloud_networking_vip_associate" "vip_10_2_1_12_associate" {
-  vip_id   = huaweicloud_networking_vip.vip_10_2_1_12.id
-  port_ids = [
+  region    = huaweicloud_networking_vip.vip_10_2_1_12.region
+  vip_id    = huaweicloud_networking_vip.vip_10_2_1_12.id
+  port_ids  = [
     split("/", huaweicloud_compute_interface_attach.nic_ecs_1_01a_net_net01.id)[1],
     split("/", huaweicloud_compute_interface_attach.nic_ecs_1_01b_net_net01.id)[1]
   ]

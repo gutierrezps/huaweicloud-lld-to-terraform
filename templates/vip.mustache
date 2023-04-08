@@ -1,11 +1,13 @@
 resource "huaweicloud_networking_vip" "vip_{{ name }}" {
-  network_id = huaweicloud_vpc_subnet.{{ subnet }}.id
-  ip_address = "{{ ip }}"
+  region      = "{{ region }}"
+  network_id  = huaweicloud_vpc_subnet.{{ subnet }}.id
+  ip_address  = "{{ ip }}"
 }
 
 resource "huaweicloud_networking_vip_associate" "vip_{{ name }}_associate" {
-  vip_id   = huaweicloud_networking_vip.vip_{{ name }}.id
-  port_ids = [
+  region    = huaweicloud_networking_vip.vip_{{ name }}.region
+  vip_id    = huaweicloud_networking_vip.vip_{{ name }}.id
+  port_ids  = [
     {{{ ports }}}
   ]
 }
