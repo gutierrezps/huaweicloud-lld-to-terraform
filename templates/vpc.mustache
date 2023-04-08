@@ -1,0 +1,6 @@
+resource "huaweicloud_vpc" "{{ vpc }}" {
+  region  = "{{ region }}"
+  name    = "{{ vpc_name }}"
+  cidr    = "{{ ipv4_cidr_block }}"
+  description = "{{ description }}"
+}
