@@ -206,6 +206,7 @@ resource "huaweicloud_evs_volume" "evs_ecs_1_02_data_2" {
 }
 
 resource "huaweicloud_compute_volume_attach" "evs_ecs_1_01_data_1_shareda_attachment" {
+  region      = "sa-brazil-1"
   instance_id = huaweicloud_compute_instance.ecs_1_01a.id
   volume_id   = huaweicloud_evs_volume.evs_ecs_1_01_data_1_shared.id
   device = "/dev/vdb"
@@ -216,6 +217,7 @@ resource "huaweicloud_compute_volume_attach" "evs_ecs_1_01_data_1_shareda_attach
 }
 
 resource "huaweicloud_compute_volume_attach" "evs_ecs_1_01a_data_2_attachment" {
+  region      = "sa-brazil-1"
   instance_id = huaweicloud_compute_instance.ecs_1_01a.id
   volume_id   = huaweicloud_evs_volume.evs_ecs_1_01a_data_2.id
   device = "/dev/vdc"
@@ -226,6 +228,7 @@ resource "huaweicloud_compute_volume_attach" "evs_ecs_1_01a_data_2_attachment" {
 }
 
 resource "huaweicloud_compute_volume_attach" "evs_ecs_1_01_data_1_sharedb_attachment" {
+  region      = "sa-brazil-1"
   instance_id = huaweicloud_compute_instance.ecs_1_01b.id
   volume_id   = huaweicloud_evs_volume.evs_ecs_1_01_data_1_shared.id
   device = "/dev/vdb"
@@ -236,6 +239,7 @@ resource "huaweicloud_compute_volume_attach" "evs_ecs_1_01_data_1_sharedb_attach
 }
 
 resource "huaweicloud_compute_volume_attach" "evs_ecs_1_01b_data_2_attachment" {
+  region      = "sa-brazil-1"
   instance_id = huaweicloud_compute_instance.ecs_1_01b.id
   volume_id   = huaweicloud_evs_volume.evs_ecs_1_01b_data_2.id
   device = "/dev/vdc"
@@ -246,6 +250,7 @@ resource "huaweicloud_compute_volume_attach" "evs_ecs_1_01b_data_2_attachment" {
 }
 
 resource "huaweicloud_compute_volume_attach" "evs_ecs_1_02_data_1_attachment" {
+  region      = "sa-brazil-1"
   instance_id = huaweicloud_compute_instance.ecs_1_02.id
   volume_id   = huaweicloud_evs_volume.evs_ecs_1_02_data_1.id
   device = "/dev/vdb"
@@ -256,6 +261,7 @@ resource "huaweicloud_compute_volume_attach" "evs_ecs_1_02_data_1_attachment" {
 }
 
 resource "huaweicloud_compute_volume_attach" "evs_ecs_1_02_data_2_attachment" {
+  region      = "sa-brazil-1"
   instance_id = huaweicloud_compute_instance.ecs_1_02.id
   volume_id   = huaweicloud_evs_volume.evs_ecs_1_02_data_2.id
   device = "/dev/vdc"
