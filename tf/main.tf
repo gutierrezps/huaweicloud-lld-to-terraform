@@ -22,11 +22,3 @@ locals {
   all_ipv4        = "0.0.0.0/0"
   all_ipv6        = "::/0"
 }
-
-resource "huaweicloud_networking_secgroup" "sg_prod" {
-  name        = "sg-prod"
-}
-
-resource "huaweicloud_networking_secgroup" "sg_test" {
-  name        = "sg-test"
-}

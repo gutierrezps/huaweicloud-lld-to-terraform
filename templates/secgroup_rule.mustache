@@ -1,0 +1,15 @@
+resource "huaweicloud_networking_secgroup_rule" "{{ rule }}" {
+  security_group_id = huaweicloud_networking_secgroup.{{ secgroup }}.id
+  direction         = "{{ direction }}"
+  ethertype         = "{{ type }}"
+  action            = "{{ action }}"
+  {{#protocol}}
+  protocol          = "{{ protocol }}"
+  {{/protocol}}
+  {{#ports}}
+  ports             = "{{ ports }}"
+  {{/ports}}
+  remote_ip_prefix  = "{{ destination_source }}"
+  priority          = {{ priority }}
+  description       = "{{ description }}"
+}

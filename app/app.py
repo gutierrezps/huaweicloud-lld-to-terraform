@@ -4,6 +4,7 @@ from openpyxl import load_workbook
 from openpyxl.worksheet.worksheet import Worksheet
 
 from .ecs2terraform import Ecs2Terraform
+from .secgroup2terraform import Secgroup2Terraform
 from .subnet2terraform import Subnet2Terraform
 from .utils import load_metadata, load_sheet_data
 from .vpc2terraform import Vpc2Terraform
@@ -57,6 +58,21 @@ def process_subnet(worksheet: Worksheet):
         subnet_handler.output_terraform_code(output_file)
 
 
+def process_secgroup(worksheet: Worksheet):
+    data = load_sheet_data(worksheet)
+
+    secgroup_handler = Secgroup2Terraform()
+
+    for row, secgroup_data in data.items():
+        error = secgroup_handler.add_secgroup_rule(secgroup_data)
+        if error is not None:
+            print(f'[ERR] {worksheet.title}, row {row}: {error}')
+            exit()
+
+    with open('tf/secgroups.tf', 'w') as output_file:
+        secgroup_handler.output_terraform_code(output_file)
+
+
 def main():
     metadata = load_metadata(METADATA_FILENAME)
     workbook = load_workbook(LLD_FILENAME, data_only=True)
@@ -66,6 +82,8 @@ def main():
     process_vpc(workbook[metadata['vpc_sheet']])
 
     process_subnet(workbook[metadata['subnet_sheet']])
+
+    process_secgroup(workbook[metadata['secgroup_sheet']])
 
 
 if __name__ == '__main__':

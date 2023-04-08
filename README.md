@@ -44,16 +44,13 @@ resources to be changed and/or destroyed.
 For now, only the following resources are converted from LLD:
 
 - VPCs and Subnets
+- Security groups
 - ECSs
   - Security group (assignment)
   - Multiple NICs
   - Multiple data disks
   - Shared disks
 - Server group (anti affinity)
-
-The following things need to be manually coded in Terraform:
-
-- Security groups
 
 Future work will be done for more resources to be converted automatically from
 the LLD to Terraform code.
