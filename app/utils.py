@@ -1,3 +1,4 @@
+import re
 from typing import Any
 
 from openpyxl import load_workbook
@@ -6,9 +7,10 @@ from openpyxl.worksheet.worksheet import Worksheet
 
 
 def clean_str(input_str: str) -> str:
-    """Transform into lowercase and replace '-', '.' and ' ' with '_'"""
-    ret = input_str.lower().replace('-', '_').replace('.', '_')
-    ret = ret.replace(' ', '_')
+    """Transform into lowercase and replace non-alphanumeric with '_ '
+    """
+    ret = input_str.lower()
+    ret = re.sub('[^0-9a-zA-Z]+', '_', ret)
     return ret
 
 
@@ -88,7 +90,8 @@ def load_sheet_columns(worksheet: Worksheet) -> dict:
 
     for col in worksheet.iter_cols(min_col=1, min_row=1, max_row=1):
         header: Cell = col[0]
-
+        if header.value is None:
+            break
         param = clean_str(header.value.strip())
         if param in columns:
             msg = f'[ERR] Duplicate header in sheet {worksheet.title}: '
