@@ -4,6 +4,7 @@ from openpyxl import load_workbook
 from openpyxl.worksheet.worksheet import Worksheet
 
 from .ecs2terraform import Ecs2Terraform
+from .subnet2terraform import Subnet2Terraform
 from .utils import load_metadata, load_sheet_data
 from .vpc2terraform import Vpc2Terraform
 
@@ -37,8 +38,23 @@ def process_vpc(worksheet: Worksheet):
             print(f'[ERR] {worksheet.title}, row {row}: {error}')
             exit()
 
-    with open('tf/vpc.tf', 'w') as output_file:
+    with open('tf/vpc_subnet.tf', 'w') as output_file:
         vpc_handler.output_terraform_code(output_file)
+
+
+def process_subnet(worksheet: Worksheet):
+    data = load_sheet_data(worksheet)
+
+    subnet_handler = Subnet2Terraform()
+
+    for row, vpc_data in data.items():
+        error = subnet_handler.add_subnet(vpc_data)
+        if error is not None:
+            print(f'[ERR] {worksheet.title}, row {row}: {error}')
+            exit()
+
+    with open('tf/vpc_subnet.tf', 'a') as output_file:
+        subnet_handler.output_terraform_code(output_file)
 
 
 def main():
@@ -48,6 +64,8 @@ def main():
     process_ecs(workbook[metadata['ecs_sheet']])
 
     process_vpc(workbook[metadata['vpc_sheet']])
+
+    process_subnet(workbook[metadata['subnet_sheet']])
 
 
 if __name__ == '__main__':

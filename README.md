@@ -43,7 +43,8 @@ resources to be changed and/or destroyed.
 
 For now, only the following resources are converted from LLD:
 
-- ECS
+- VPCs and Subnets
+- ECSs
   - Security group (assignment)
   - Multiple NICs
   - Multiple data disks
@@ -52,7 +53,6 @@ For now, only the following resources are converted from LLD:
 
 The following things need to be manually coded in Terraform:
 
-- VPCs and subnets
 - Security groups
 
 Future work will be done for more resources to be converted automatically from

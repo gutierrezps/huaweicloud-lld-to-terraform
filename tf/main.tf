@@ -23,49 +23,6 @@ locals {
   all_ipv6        = "::/0"
 }
 
-resource "huaweicloud_vpc" "vpc_prod" {
-  name = "vpc-prod"
-  cidr = "10.1.0.0/16"
-}
-
-resource "huaweicloud_vpc_subnet" "subnet_prod_1" {
-  name        = "subnet-prod-1"
-  cidr        = "10.1.1.0/24"
-  gateway_ip  = "10.1.1.1"
-  vpc_id      = huaweicloud_vpc.vpc_prod.id
-  availability_zone = "sa-brazil-1b"
-}
-
-resource "huaweicloud_vpc_subnet" "subnet_prod_2" {
-  name        = "subnet-prod-2"
-  cidr        = "10.1.2.0/24"
-  gateway_ip  = "10.1.2.1"
-  vpc_id      = huaweicloud_vpc.vpc_prod.id
-  availability_zone = "sa-brazil-1b"
-}
-
-resource "huaweicloud_vpc" "vpc_sync" {
-  name = "vpc-sync"
-  cidr = "10.2.0.0/16"
-}
-
-resource "huaweicloud_vpc_subnet" "subnet_sync_1" {
-  name        = "subnet-sync-1"
-  cidr        = "10.2.1.0/24"
-  gateway_ip  = "10.2.1.1"
-  vpc_id      = huaweicloud_vpc.vpc_sync.id
-  availability_zone = "sa-brazil-1b"
-}
-
-
-resource "huaweicloud_vpc_subnet" "subnet_sync_2" {
-  name        = "subnet-sync-2"
-  cidr        = "10.2.2.0/24"
-  gateway_ip  = "10.2.2.1"
-  vpc_id      = huaweicloud_vpc.vpc_sync.id
-  availability_zone = "sa-brazil-1b"
-}
-
 resource "huaweicloud_networking_secgroup" "sg_prod" {
   name        = "sg-prod"
 }

@@ -1,0 +1,8 @@
+resource "huaweicloud_vpc_subnet" "{{ subnet }}" {
+  name        = "{{ subnet_name }}"
+  cidr        = "{{ ipv4_cidr_block }}"
+  gateway_ip  = "{{ gateway }}"
+  vpc_id      = huaweicloud_vpc.{{ vpc }}.id
+  description = "{{ description }}"
+  availability_zone = "{{ az }}"
+}
