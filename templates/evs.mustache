@@ -1,5 +1,6 @@
 resource "huaweicloud_evs_volume" "evs_{{ evs_name }}" {
   name              = "{{ evs_name }}"
+  region            = "{{ region }}"
   availability_zone = "{{ az }}"
   volume_type       = "{{ type }}"
   size              = {{ size }}

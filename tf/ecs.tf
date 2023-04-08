@@ -3,6 +3,7 @@ resource "huaweicloud_compute_instance" "ecs_1_01a" {
   image_id            = "68a783a4-25b2-4069-bc25-d927eeb7f97b"
   flavor_id           = "s6.small.1"
   security_group_ids  = [ huaweicloud_networking_secgroup.sg_prod.id ]
+  region              = "sa-brazil-1"
   availability_zone   = "sa-brazil-1b"
   admin_pass          = "Huawei@1234"
   system_disk_type    = "SAS"
@@ -24,6 +25,7 @@ resource "huaweicloud_compute_instance" "ecs_1_01b" {
   image_id            = "68a783a4-25b2-4069-bc25-d927eeb7f97b"
   flavor_id           = "s6.small.1"
   security_group_ids  = [ huaweicloud_networking_secgroup.sg_prod.id ]
+  region              = "sa-brazil-1"
   availability_zone   = "sa-brazil-1b"
   admin_pass          = "Huawei@1234"
   system_disk_type    = "SAS"
@@ -45,6 +47,7 @@ resource "huaweicloud_compute_instance" "ecs_1_02" {
   image_id            = "3075b5b0-bc15-4998-97b6-7c3d5eb5d911"
   flavor_id           = "t6.small.1"
   security_group_ids  = [ huaweicloud_networking_secgroup.sg_prod.id ]
+  region              = "sa-brazil-1"
   availability_zone   = "sa-brazil-1a"
   admin_pass          = "Huawei@1234"
   system_disk_type    = "SSD"
@@ -66,6 +69,7 @@ resource "huaweicloud_compute_instance" "ecs_1_03" {
   image_id            = "3075b5b0-bc15-4998-97b6-7c3d5eb5d911"
   flavor_id           = "t6.small.1"
   security_group_ids  = [ huaweicloud_networking_secgroup.sg_prod.id ]
+  region              = "sa-brazil-1"
   availability_zone   = "sa-brazil-1a"
   admin_pass          = "Huawei@1234"
   system_disk_type    = "SSD"
@@ -137,6 +141,7 @@ resource "huaweicloud_networking_vip_associate" "vip_10_2_1_12_associate" {
 
 resource "huaweicloud_evs_volume" "evs_ecs_1_01_data_1_shared" {
   name              = "ecs_1_01_data_1_shared"
+  region            = "sa-brazil-1"
   availability_zone = "sa-brazil-1b"
   volume_type       = "SAS"
   size              = 1024
@@ -149,6 +154,7 @@ resource "huaweicloud_evs_volume" "evs_ecs_1_01_data_1_shared" {
 
 resource "huaweicloud_evs_volume" "evs_ecs_1_01a_data_2" {
   name              = "ecs_1_01a_data_2"
+  region            = "sa-brazil-1"
   availability_zone = "sa-brazil-1b"
   volume_type       = "SAS"
   size              = 512
@@ -161,6 +167,7 @@ resource "huaweicloud_evs_volume" "evs_ecs_1_01a_data_2" {
 
 resource "huaweicloud_evs_volume" "evs_ecs_1_01b_data_2" {
   name              = "ecs_1_01b_data_2"
+  region            = "sa-brazil-1"
   availability_zone = "sa-brazil-1b"
   volume_type       = "SAS"
   size              = 512
@@ -173,6 +180,7 @@ resource "huaweicloud_evs_volume" "evs_ecs_1_01b_data_2" {
 
 resource "huaweicloud_evs_volume" "evs_ecs_1_02_data_1" {
   name              = "ecs_1_02_data_1"
+  region            = "sa-brazil-1"
   availability_zone = "sa-brazil-1a"
   volume_type       = "SSD"
   size              = 512
@@ -185,6 +193,7 @@ resource "huaweicloud_evs_volume" "evs_ecs_1_02_data_1" {
 
 resource "huaweicloud_evs_volume" "evs_ecs_1_02_data_2" {
   name              = "ecs_1_02_data_2"
+  region            = "sa-brazil-1"
   availability_zone = "sa-brazil-1a"
   volume_type       = "SAS"
   size              = 512

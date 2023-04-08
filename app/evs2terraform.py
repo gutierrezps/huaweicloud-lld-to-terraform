@@ -72,7 +72,7 @@ class Evs2Terraform:
         device = '/dev/vd' + chr(ord('a') + i_disk)
         evs_data['evs_device'] = device
 
-        COPY_PARAMS = ['ecs_name', 'az']
+        COPY_PARAMS = ['ecs_name', 'region', 'az']
         for param in COPY_PARAMS:
             evs_data[param] = ecs_data[param]
 
