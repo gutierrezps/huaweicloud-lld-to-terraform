@@ -5,6 +5,7 @@ resource "huaweicloud_networking_secgroup" "dev_sg001" {
 }
 
 resource "huaweicloud_networking_secgroup_rule" "dev_sg001_rule01" {
+  region            = "sa-brazil-1"
   security_group_id = huaweicloud_networking_secgroup.dev_sg001.id
   direction         = "ingress"
   ethertype         = "IPv4"
@@ -15,6 +16,7 @@ resource "huaweicloud_networking_secgroup_rule" "dev_sg001_rule01" {
 }
 
 resource "huaweicloud_networking_secgroup_rule" "dev_sg001_rule02" {
+  region            = "sa-brazil-1"
   security_group_id = huaweicloud_networking_secgroup.dev_sg001.id
   direction         = "egress"
   ethertype         = "IPv4"
@@ -31,6 +33,7 @@ resource "huaweicloud_networking_secgroup" "stg_sg001" {
 }
 
 resource "huaweicloud_networking_secgroup_rule" "stg_sg001_rule01" {
+  region            = "sa-brazil-1"
   security_group_id = huaweicloud_networking_secgroup.stg_sg001.id
   direction         = "ingress"
   ethertype         = "IPv4"
@@ -41,6 +44,7 @@ resource "huaweicloud_networking_secgroup_rule" "stg_sg001_rule01" {
 }
 
 resource "huaweicloud_networking_secgroup_rule" "stg_sg001_rule02" {
+  region            = "sa-brazil-1"
   security_group_id = huaweicloud_networking_secgroup.stg_sg001.id
   direction         = "egress"
   ethertype         = "IPv4"
@@ -57,6 +61,7 @@ resource "huaweicloud_networking_secgroup" "prd_sg001" {
 }
 
 resource "huaweicloud_networking_secgroup_rule" "prd_sg001_rule01" {
+  region            = "sa-brazil-1"
   security_group_id = huaweicloud_networking_secgroup.prd_sg001.id
   direction         = "ingress"
   ethertype         = "IPv4"
@@ -67,6 +72,7 @@ resource "huaweicloud_networking_secgroup_rule" "prd_sg001_rule01" {
 }
 
 resource "huaweicloud_networking_secgroup_rule" "prd_sg001_rule02" {
+  region            = "sa-brazil-1"
   security_group_id = huaweicloud_networking_secgroup.prd_sg001.id
   direction         = "egress"
   ethertype         = "IPv4"
