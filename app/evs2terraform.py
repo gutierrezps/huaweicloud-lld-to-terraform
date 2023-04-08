@@ -99,8 +99,8 @@ class Evs2Terraform:
             self.ecs_attachments[ecs_data['ecs_name']].append(evs)
 
     def add_servergroup_deps(self, server_groups: dict):
-        for group_name, ecs_list in server_groups.items():
-            for ecs_name in ecs_list:
+        for group_name, group_data in server_groups.items():
+            for ecs_name in group_data['ecs_names']:
                 self.ecs_servergroup[ecs_name] = group_name
 
     def _disks_to_tfcode(self) -> str:

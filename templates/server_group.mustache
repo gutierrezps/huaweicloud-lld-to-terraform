@@ -1,7 +1,0 @@
-resource "huaweicloud_compute_servergroup" "servergroup_{{ name }}" {
-  name     = "{{ name }}"
-  policies = ["anti-affinity"]
-  members  = [
-    {{ members }}
-  ]
-}

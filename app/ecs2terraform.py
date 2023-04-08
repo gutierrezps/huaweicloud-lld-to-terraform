@@ -9,7 +9,7 @@ from .utils import clean_str
 class Ecs2Terraform:
     def __init__(self):
         self._ecs = {}
-        self._server_groups = {}
+        self._servergroups = {}
         self._nics_handler = Nics2Terraform()
         self._evs_handler = Evs2Terraform()
 
@@ -36,16 +36,20 @@ class Ecs2Terraform:
 
         return None
 
-    def _add_server_group(self, ecs_data: dict):
+    def _add_servergroup(self, ecs_data: dict):
         ecs_group = ecs_data.get('ecs_group', None)
 
         if ecs_group is None:
             return None
 
-        if ecs_group not in self._server_groups:
-            self._server_groups[ecs_group] = []
+        if ecs_group not in self._servergroups:
+            self._servergroups[ecs_group] = {
+                'name': ecs_group,
+                'region': ecs_data['region'],
+                'ecs_names': []
+            }
 
-        self._server_groups[ecs_group].append(ecs_data['ecs_name'])
+        self._servergroups[ecs_group]['ecs_names'].append(ecs_data['ecs_name'])
 
         return None
 
@@ -59,7 +63,7 @@ class Ecs2Terraform:
             self._validate_ecs,
             self._nics_handler.add_nics,
             self._evs_handler.add_disks,
-            self._add_server_group,
+            self._add_servergroup,
         ]
 
         for fn in functions:
@@ -74,17 +78,20 @@ class Ecs2Terraform:
 
         return None
 
-    def _server_groups_to_tfcode(self):
+    def _servergroups_to_tfcode(self):
         """Transforms server Groups to Terraform code.
 
         Example input data:
 
         {
-            'group_name': ['srv01', 'srv02']
+            'group_name': {
+                'name': 'group_name',
+                'region': '...',
+                'ecs_names: ['srv01', 'srv02']
         }
 
         Args:
-            server_groups (dict): key is the group name, and value is the
+            servergroups (dict): key is the group name, and value is the
                 list of ecs_names
 
         Returns:
@@ -93,18 +100,16 @@ class Ecs2Terraform:
         tf_code = ''
         renderer = Renderer()
 
-        for group_name, ecs_names in self._server_groups.items():
-            data = {'name': group_name}
-
+        for data in self._servergroups.values():
             members = [
                     f'huaweicloud_compute_instance.{name}.id'
-                    for name in ecs_names
+                    for name in data['ecs_names']
                 ]
 
             # transform array into string and preserve tf_code indentation
             data['members'] = ',\n    '.join(members)
 
-            tf_code += renderer.render_name('templates/server_group', data)
+            tf_code += renderer.render_name('templates/servergroup', data)
             tf_code += '\n'
 
         return tf_code
@@ -123,10 +128,10 @@ class Ecs2Terraform:
             tf_code += '\n'
             output_file.write(tf_code)
 
-        output_file.write(self._server_groups_to_tfcode())
+        output_file.write(self._servergroups_to_tfcode())
 
-        self._nics_handler.add_servergroup_deps(self._server_groups)
+        self._nics_handler.add_servergroup_deps(self._servergroups)
         output_file.write(self._nics_handler.terraform_code())
 
-        self._evs_handler.add_servergroup_deps(self._server_groups)
+        self._evs_handler.add_servergroup_deps(self._servergroups)
         output_file.write(self._evs_handler.terraform_code())

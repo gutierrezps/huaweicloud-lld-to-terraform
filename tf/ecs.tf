@@ -87,9 +87,10 @@ resource "huaweicloud_compute_instance" "ecs_1_03" {
 }
 
 resource "huaweicloud_compute_servergroup" "servergroup_group01" {
-  name     = "group01"
-  policies = ["anti-affinity"]
-  members  = [
+  region    = "sa-brazil-1"
+  name      = "group01"
+  policies  = ["anti-affinity"]
+  members   = [
     huaweicloud_compute_instance.ecs_1_01a.id,
     huaweicloud_compute_instance.ecs_1_01b.id
   ]
