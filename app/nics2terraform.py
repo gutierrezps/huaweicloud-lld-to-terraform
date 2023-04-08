@@ -76,9 +76,11 @@ class Nics2Terraform:
                 self.ecs_servergroup[ecs_name] = group_name
 
     def _add_nic(self, ecs_data: dict, i_nic: int):
-        nic_data = {
-            'ecs_name': ecs_data['ecs_name']
-        }
+        nic_data = {}
+
+        # copy values from ecs_data
+        for p in ['ecs_name', 'region']:
+            nic_data[p] = ecs_data[p]
 
         params = [f'nic{ i_nic }_{p}' for p in self.NIC_PARAMS]
 

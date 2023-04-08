@@ -1,4 +1,5 @@
 resource "huaweicloud_compute_interface_attach" "nic_{{ ecs_name }}_{{ subnet }}" {
+  region      = "{{ region }}"
   instance_id = huaweicloud_compute_instance.{{ ecs_name }}.id
   network_id  = huaweicloud_vpc_subnet.{{ subnet }}.id
   fixed_ip    = "{{ fixed_ip }}"

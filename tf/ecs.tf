@@ -97,6 +97,7 @@ resource "huaweicloud_compute_servergroup" "servergroup_group01" {
 }
 
 resource "huaweicloud_compute_interface_attach" "nic_ecs_1_01a_net_net01" {
+  region      = "sa-brazil-1"
   instance_id = huaweicloud_compute_instance.ecs_1_01a.id
   network_id  = huaweicloud_vpc_subnet.net_net01.id
   fixed_ip    = "10.2.1.10"
@@ -106,6 +107,7 @@ resource "huaweicloud_compute_interface_attach" "nic_ecs_1_01a_net_net01" {
 }
 
 resource "huaweicloud_compute_interface_attach" "nic_ecs_1_01b_net_net01" {
+  region      = "sa-brazil-1"
   instance_id = huaweicloud_compute_instance.ecs_1_01b.id
   network_id  = huaweicloud_vpc_subnet.net_net01.id
   fixed_ip    = "10.2.1.11"
