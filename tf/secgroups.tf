@@ -2,6 +2,7 @@ resource "huaweicloud_networking_secgroup" "dev_sg001" {
   region  = "sa-brazil-1"
   name    = "dev-sg001"
   delete_default_rules = true
+  enterprise_project_id = data.huaweicloud_enterprise_project.ep_dev.id
 }
 
 resource "huaweicloud_networking_secgroup_rule" "dev_sg001_rule01" {
@@ -30,6 +31,7 @@ resource "huaweicloud_networking_secgroup" "stg_sg001" {
   region  = "sa-brazil-1"
   name    = "stg-sg001"
   delete_default_rules = true
+  enterprise_project_id = data.huaweicloud_enterprise_project.ep_stg.id
 }
 
 resource "huaweicloud_networking_secgroup_rule" "stg_sg001_rule01" {
@@ -58,6 +60,7 @@ resource "huaweicloud_networking_secgroup" "prd_sg001" {
   region  = "sa-brazil-1"
   name    = "prd-sg001"
   delete_default_rules = true
+  enterprise_project_id = data.huaweicloud_enterprise_project.ep_prod.id
 }
 
 resource "huaweicloud_networking_secgroup_rule" "prd_sg001_rule01" {

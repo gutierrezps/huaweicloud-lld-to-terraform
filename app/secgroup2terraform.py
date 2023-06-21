@@ -18,6 +18,9 @@ class Secgroup2Terraform:
                 'region': rule_data['region'],
                 'rules': []
             }
+            if 'enterprise_project' in rule_data:
+                project = clean_str(rule_data['enterprise_project'])
+                self._secgroup[secgroup]['project'] = project
 
         if rule_data['protocol'] == 'all':
             del rule_data['protocol']
