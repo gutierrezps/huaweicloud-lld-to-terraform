@@ -5,7 +5,7 @@ resource "huaweicloud_compute_instance" "{{ ecs_name }}" {
   security_group_ids  = [ huaweicloud_networking_secgroup.{{ nic1_security_group }}.id ]
   region              = "{{ region }}"
   availability_zone   = "{{ az }}"
-  admin_pass          = "Huawei@1234"
+  admin_pass          = "{{ os_password }}"
   system_disk_type    = "{{ system_disk_type }}"
   system_disk_size    = {{ system_disk_size }}
   {{#project}}
