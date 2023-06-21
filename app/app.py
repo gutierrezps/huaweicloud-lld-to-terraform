@@ -1,4 +1,5 @@
 from pprint import pprint  # noqa: F401
+from typing import Callable
 
 from openpyxl import load_workbook
 from openpyxl.worksheet.worksheet import Worksheet
@@ -13,16 +14,29 @@ LLD_FILENAME = 'LLD.xlsx'
 METADATA_FILENAME = 'metadata.xlsx'
 
 
+def process_sheet_data(
+        sheet_title: str,
+        sheet_data: list,
+        handler_method: Callable
+        ):
+    for row_number, row_data in sheet_data.items():
+        error = None
+        try:
+            error = handler_method(row_data)
+        except KeyError as e:
+            error = 'mandatory column "' + e.args[0] + '" not set'
+
+        if error is not None:
+            print(f'[ERR] Sheet "{sheet_title}", row {row_number}: {error}')
+            exit()
+
+
 def process_ecs(worksheet: Worksheet):
     data = load_sheet_data(worksheet)
 
     ecs_handler = Ecs2Terraform()
 
-    for row, ecs_data in data.items():
-        error = ecs_handler.add_ecs(ecs_data)
-        if error is not None:
-            print(f'[ERR] {worksheet.title}, row {row}: {error}')
-            exit()
+    process_sheet_data(worksheet.title, data, ecs_handler.add_ecs)
 
     with open('tf/ecs.tf', 'w') as output_file:
         ecs_handler.output_terraform_code(output_file)
@@ -33,11 +47,7 @@ def process_vpc(worksheet: Worksheet):
 
     vpc_handler = Vpc2Terraform()
 
-    for row, vpc_data in data.items():
-        error = vpc_handler.add_vpc(vpc_data)
-        if error is not None:
-            print(f'[ERR] {worksheet.title}, row {row}: {error}')
-            exit()
+    process_sheet_data(worksheet.title, data, vpc_handler.add_vpc)
 
     with open('tf/vpc_subnet.tf', 'w') as output_file:
         vpc_handler.output_terraform_code(output_file)
@@ -48,11 +58,7 @@ def process_subnet(worksheet: Worksheet):
 
     subnet_handler = Subnet2Terraform()
 
-    for row, vpc_data in data.items():
-        error = subnet_handler.add_subnet(vpc_data)
-        if error is not None:
-            print(f'[ERR] {worksheet.title}, row {row}: {error}')
-            exit()
+    process_sheet_data(worksheet.title, data, subnet_handler.add_subnet)
 
     with open('tf/vpc_subnet.tf', 'a') as output_file:
         subnet_handler.output_terraform_code(output_file)
@@ -63,11 +69,8 @@ def process_secgroup(worksheet: Worksheet):
 
     secgroup_handler = Secgroup2Terraform()
 
-    for row, secgroup_data in data.items():
-        error = secgroup_handler.add_secgroup_rule(secgroup_data)
-        if error is not None:
-            print(f'[ERR] {worksheet.title}, row {row}: {error}')
-            exit()
+    process_sheet_data(
+        worksheet.title, data, secgroup_handler.add_secgroup_rule)
 
     with open('tf/secgroups.tf', 'w') as output_file:
         secgroup_handler.output_terraform_code(output_file)
