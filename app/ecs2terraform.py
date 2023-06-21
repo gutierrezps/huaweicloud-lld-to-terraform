@@ -57,6 +57,9 @@ class Ecs2Terraform:
         ecs_name = clean_str(ecs_data['hostname'])
         ecs_data['ecs_name'] = ecs_name
 
+        if 'enterprise_project' in ecs_data:
+            ecs_data['project'] = clean_str(ecs_data['enterprise_project'])
+
         ecs_data = self._transform_params(ecs_data)
 
         functions = [

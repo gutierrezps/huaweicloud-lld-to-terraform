@@ -8,6 +8,7 @@ resource "huaweicloud_compute_instance" "ecs_1_01a" {
   admin_pass          = "Huawei@1234"
   system_disk_type    = "SAS"
   system_disk_size    = 50
+  enterprise_project_id = data.huaweicloud_enterprise_project.ep_dev.id
 
   network {
     uuid              = huaweicloud_vpc_subnet.prod_prod01.id
@@ -30,6 +31,7 @@ resource "huaweicloud_compute_instance" "ecs_1_01b" {
   admin_pass          = "Huawei@1234"
   system_disk_type    = "SAS"
   system_disk_size    = 50
+  enterprise_project_id = data.huaweicloud_enterprise_project.ep_dev.id
 
   network {
     uuid              = huaweicloud_vpc_subnet.prod_prod01.id
@@ -52,6 +54,7 @@ resource "huaweicloud_compute_instance" "ecs_1_02" {
   admin_pass          = "Huawei@1234"
   system_disk_type    = "SSD"
   system_disk_size    = 100
+  enterprise_project_id = data.huaweicloud_enterprise_project.ep_stg.id
 
   network {
     uuid              = huaweicloud_vpc_subnet.prod_prod01.id
@@ -74,6 +77,7 @@ resource "huaweicloud_compute_instance" "ecs_1_03" {
   admin_pass          = "Huawei@1234"
   system_disk_type    = "SSD"
   system_disk_size    = 100
+  enterprise_project_id = data.huaweicloud_enterprise_project.ep_prod.id
 
   network {
     uuid              = huaweicloud_vpc_subnet.prod_prod01.id
@@ -153,6 +157,7 @@ resource "huaweicloud_evs_volume" "evs_ecs_1_01_data_1_shared" {
   volume_type       = "SAS"
   size              = 1024
   multiattach       = true
+  enterprise_project_id = data.huaweicloud_enterprise_project.ep_dev.id
 
   tags = {
     deployed_by   = "terraform"
@@ -166,6 +171,7 @@ resource "huaweicloud_evs_volume" "evs_ecs_1_01a_data_2" {
   volume_type       = "SAS"
   size              = 512
   multiattach       = false
+  enterprise_project_id = data.huaweicloud_enterprise_project.ep_dev.id
 
   tags = {
     deployed_by   = "terraform"
@@ -179,6 +185,7 @@ resource "huaweicloud_evs_volume" "evs_ecs_1_01b_data_2" {
   volume_type       = "SAS"
   size              = 512
   multiattach       = false
+  enterprise_project_id = data.huaweicloud_enterprise_project.ep_dev.id
 
   tags = {
     deployed_by   = "terraform"
@@ -192,6 +199,7 @@ resource "huaweicloud_evs_volume" "evs_ecs_1_02_data_1" {
   volume_type       = "SSD"
   size              = 512
   multiattach       = false
+  enterprise_project_id = data.huaweicloud_enterprise_project.ep_stg.id
 
   tags = {
     deployed_by   = "terraform"
@@ -205,6 +213,7 @@ resource "huaweicloud_evs_volume" "evs_ecs_1_02_data_2" {
   volume_type       = "SAS"
   size              = 512
   multiattach       = false
+  enterprise_project_id = data.huaweicloud_enterprise_project.ep_stg.id
 
   tags = {
     deployed_by   = "terraform"

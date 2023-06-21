@@ -76,6 +76,9 @@ class Evs2Terraform:
         for param in COPY_PARAMS:
             evs_data[param] = ecs_data[param]
 
+        if 'project' in ecs_data:
+            evs_data['project'] = ecs_data['project']
+
         # Terraform bool is all lowercase
         evs_data['shared'] = str(is_shared).lower()
 

@@ -8,6 +8,9 @@ resource "huaweicloud_compute_instance" "{{ ecs_name }}" {
   admin_pass          = "Huawei@1234"
   system_disk_type    = "{{ system_disk_type }}"
   system_disk_size    = {{ system_disk_size }}
+  {{#project}}
+  enterprise_project_id = data.huaweicloud_enterprise_project.ep_{{ project }}.id
+  {{/project}}
 
   network {
     uuid              = huaweicloud_vpc_subnet.{{ nic1_subnet }}.id
