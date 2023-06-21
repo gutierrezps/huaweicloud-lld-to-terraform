@@ -59,7 +59,8 @@ resource "huaweicloud_compute_instance" "ecs_dev" {
   security_group_ids  = [ huaweicloud_networking_secgroup.dev_sg001.id ]
   region              = "sa-brazil-1"
   availability_zone   = "sa-brazil-1a"
-  admin_pass          = ""
+  admin_pass          = "qwerty1234!#"
+  key_pair            = "keypair-01"
   system_disk_type    = "SAS"
   system_disk_size    = 100
   enterprise_project_id = data.huaweicloud_enterprise_project.ep_dev.id
@@ -82,7 +83,8 @@ resource "huaweicloud_compute_instance" "ecs_stg" {
   security_group_ids  = [ huaweicloud_networking_secgroup.dev_sg001.id ]
   region              = "sa-brazil-1"
   availability_zone   = "sa-brazil-1a"
-  admin_pass          = ""
+  admin_pass          = "qwerty1234!#"
+  key_pair            = "keypair-01"
   system_disk_type    = "SAS"
   system_disk_size    = 100
   enterprise_project_id = data.huaweicloud_enterprise_project.ep_stg.id

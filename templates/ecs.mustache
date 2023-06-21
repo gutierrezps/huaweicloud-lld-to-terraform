@@ -6,6 +6,9 @@ resource "huaweicloud_compute_instance" "{{ ecs_name }}" {
   region              = "{{ region }}"
   availability_zone   = "{{ az }}"
   admin_pass          = "{{ os_password }}"
+  {{#keypair_name}}
+  key_pair            = "{{ keypair_name }}"
+  {{/keypair_name}}
   system_disk_type    = "{{ system_disk_type }}"
   system_disk_size    = {{ system_disk_size }}
   {{#project}}
