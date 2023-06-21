@@ -2,7 +2,7 @@ resource "huaweicloud_compute_instance" "ecs_1_01a" {
   name                = "ecs-1-01a"
   image_id            = "68a783a4-25b2-4069-bc25-d927eeb7f97b"
   flavor_id           = "s6.small.1"
-  security_group_ids  = [ huaweicloud_networking_secgroup.dev_sg001.id ]
+  security_group_ids  = [ huaweicloud_networking_secgroup.prd_sg001.id ]
   region              = "sa-brazil-1"
   availability_zone   = "sa-brazil-1b"
   admin_pass          = "Huawei@1234"
@@ -12,8 +12,12 @@ resource "huaweicloud_compute_instance" "ecs_1_01a" {
 
   network {
     uuid              = huaweicloud_vpc_subnet.prod_prod01.id
-    fixed_ip_v4       = "10.1.1.10"
+    fixed_ip_v4       = "10.3.1.10"
     source_dest_check = false
+  }
+
+  scheduler_hints {
+    group         = huaweicloud_compute_servergroup.servergroup_group01.id
   }
 
   tags = {
@@ -25,7 +29,7 @@ resource "huaweicloud_compute_instance" "ecs_1_01b" {
   name                = "ecs-1-01b"
   image_id            = "68a783a4-25b2-4069-bc25-d927eeb7f97b"
   flavor_id           = "s6.small.1"
-  security_group_ids  = [ huaweicloud_networking_secgroup.dev_sg001.id ]
+  security_group_ids  = [ huaweicloud_networking_secgroup.prd_sg001.id ]
   region              = "sa-brazil-1"
   availability_zone   = "sa-brazil-1b"
   admin_pass          = "Huawei@1234"
@@ -35,8 +39,12 @@ resource "huaweicloud_compute_instance" "ecs_1_01b" {
 
   network {
     uuid              = huaweicloud_vpc_subnet.prod_prod01.id
-    fixed_ip_v4       = "10.1.1.11"
+    fixed_ip_v4       = "10.3.1.11"
     source_dest_check = false
+  }
+
+  scheduler_hints {
+    group         = huaweicloud_compute_servergroup.servergroup_group01.id
   }
 
   tags = {
@@ -48,7 +56,7 @@ resource "huaweicloud_compute_instance" "ecs_1_02" {
   name                = "ecs-1-02"
   image_id            = "3075b5b0-bc15-4998-97b6-7c3d5eb5d911"
   flavor_id           = "t6.small.1"
-  security_group_ids  = [ huaweicloud_networking_secgroup.prd_sg001.id ]
+  security_group_ids  = [ huaweicloud_networking_secgroup.dev_sg001.id ]
   region              = "sa-brazil-1"
   availability_zone   = "sa-brazil-1a"
   admin_pass          = "Huawei@1234"
@@ -57,7 +65,7 @@ resource "huaweicloud_compute_instance" "ecs_1_02" {
   enterprise_project_id = data.huaweicloud_enterprise_project.ep_stg.id
 
   network {
-    uuid              = huaweicloud_vpc_subnet.prod_prod01.id
+    uuid              = huaweicloud_vpc_subnet.dev_dev01.id
     fixed_ip_v4       = "10.1.1.20"
     source_dest_check = true
   }
@@ -71,7 +79,7 @@ resource "huaweicloud_compute_instance" "ecs_1_03" {
   name                = "ecs-1-03"
   image_id            = "3075b5b0-bc15-4998-97b6-7c3d5eb5d911"
   flavor_id           = "t6.small.1"
-  security_group_ids  = [ huaweicloud_networking_secgroup.prd_sg001.id ]
+  security_group_ids  = [ huaweicloud_networking_secgroup.dev_sg001.id ]
   region              = "sa-brazil-1"
   availability_zone   = "sa-brazil-1a"
   admin_pass          = "Huawei@1234"
@@ -80,8 +88,8 @@ resource "huaweicloud_compute_instance" "ecs_1_03" {
   enterprise_project_id = data.huaweicloud_enterprise_project.ep_prod.id
 
   network {
-    uuid              = huaweicloud_vpc_subnet.prod_prod01.id
-    fixed_ip_v4       = "10.1.1.21"
+    uuid              = huaweicloud_vpc_subnet.stg_stg01.id
+    fixed_ip_v4       = "10.2.1.21"
     source_dest_check = true
   }
 
@@ -94,56 +102,52 @@ resource "huaweicloud_compute_servergroup" "servergroup_group01" {
   region    = "sa-brazil-1"
   name      = "group01"
   policies  = ["anti-affinity"]
-  members   = [
-    huaweicloud_compute_instance.ecs_1_01a.id,
-    huaweicloud_compute_instance.ecs_1_01b.id
-  ]
 }
 
 resource "huaweicloud_compute_interface_attach" "nic_ecs_1_01a_net_net01" {
   region      = "sa-brazil-1"
   instance_id = huaweicloud_compute_instance.ecs_1_01a.id
   network_id  = huaweicloud_vpc_subnet.net_net01.id
-  fixed_ip    = "10.2.1.10"
-  security_group_ids  = [ huaweicloud_networking_secgroup.dev_sg001.id ]
+  fixed_ip    = "10.4.1.10"
+  security_group_ids  = [ huaweicloud_networking_secgroup.prd_sg001.id ]
   source_dest_check   = false
-  depends_on  = [ huaweicloud_compute_servergroup.servergroup_group01 ]
+  depends_on  = [  ]
 }
 
 resource "huaweicloud_compute_interface_attach" "nic_ecs_1_01b_net_net01" {
   region      = "sa-brazil-1"
   instance_id = huaweicloud_compute_instance.ecs_1_01b.id
   network_id  = huaweicloud_vpc_subnet.net_net01.id
-  fixed_ip    = "10.2.1.11"
-  security_group_ids  = [ huaweicloud_networking_secgroup.dev_sg001.id ]
+  fixed_ip    = "10.4.1.11"
+  security_group_ids  = [ huaweicloud_networking_secgroup.prd_sg001.id ]
   source_dest_check   = false
-  depends_on  = [ huaweicloud_compute_servergroup.servergroup_group01 ]
+  depends_on  = [  ]
 }
 
-resource "huaweicloud_networking_vip" "vip_10_1_1_12" {
+resource "huaweicloud_networking_vip" "vip_10_3_1_12" {
   region      = "sa-brazil-1"
   network_id  = huaweicloud_vpc_subnet.prod_prod01.id
-  ip_address  = "10.1.1.12"
+  ip_address  = "10.3.1.12"
 }
 
-resource "huaweicloud_networking_vip_associate" "vip_10_1_1_12_associate" {
-  region    = huaweicloud_networking_vip.vip_10_1_1_12.region
-  vip_id    = huaweicloud_networking_vip.vip_10_1_1_12.id
+resource "huaweicloud_networking_vip_associate" "vip_10_3_1_12_associate" {
+  region    = huaweicloud_networking_vip.vip_10_3_1_12.region
+  vip_id    = huaweicloud_networking_vip.vip_10_3_1_12.id
   port_ids  = [
     huaweicloud_compute_instance.ecs_1_01a.network[0].port,
     huaweicloud_compute_instance.ecs_1_01b.network[0].port
   ]
 }
 
-resource "huaweicloud_networking_vip" "vip_10_2_1_12" {
+resource "huaweicloud_networking_vip" "vip_10_4_1_12" {
   region      = "sa-brazil-1"
   network_id  = huaweicloud_vpc_subnet.net_net01.id
-  ip_address  = "10.2.1.12"
+  ip_address  = "10.4.1.12"
 }
 
-resource "huaweicloud_networking_vip_associate" "vip_10_2_1_12_associate" {
-  region    = huaweicloud_networking_vip.vip_10_2_1_12.region
-  vip_id    = huaweicloud_networking_vip.vip_10_2_1_12.id
+resource "huaweicloud_networking_vip_associate" "vip_10_4_1_12_associate" {
+  region    = huaweicloud_networking_vip.vip_10_4_1_12.region
+  vip_id    = huaweicloud_networking_vip.vip_10_4_1_12.id
   port_ids  = [
     split("/", huaweicloud_compute_interface_attach.nic_ecs_1_01a_net_net01.id)[1],
     split("/", huaweicloud_compute_interface_attach.nic_ecs_1_01b_net_net01.id)[1]
@@ -225,7 +229,7 @@ resource "huaweicloud_compute_volume_attach" "evs_ecs_1_01_data_1_shareda_attach
   instance_id = huaweicloud_compute_instance.ecs_1_01a.id
   volume_id   = huaweicloud_evs_volume.evs_ecs_1_01_data_1_shared.id
   device = "/dev/vdb"
-  depends_on = [ huaweicloud_compute_servergroup.servergroup_group01 ]
+  depends_on = [  ]
   timeouts {
     create = "20m"
   }
@@ -247,7 +251,7 @@ resource "huaweicloud_compute_volume_attach" "evs_ecs_1_01_data_1_sharedb_attach
   instance_id = huaweicloud_compute_instance.ecs_1_01b.id
   volume_id   = huaweicloud_evs_volume.evs_ecs_1_01_data_1_shared.id
   device = "/dev/vdb"
-  depends_on = [ huaweicloud_compute_servergroup.servergroup_group01 ]
+  depends_on = [  ]
   timeouts {
     create = "20m"
   }

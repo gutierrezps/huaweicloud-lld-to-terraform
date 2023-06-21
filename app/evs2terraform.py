@@ -10,7 +10,6 @@ class Evs2Terraform:
         self.current_ecs_disks = {}
         self.data_disks = {}
         self.ecs_attachments = {}
-        self.ecs_servergroup = {}
 
     def _extract_data_disk_params(self, ecs_data: dict, i_disk: int):
         self.current_ecs_disks[i_disk] = {}
@@ -101,11 +100,6 @@ class Evs2Terraform:
                 self.data_disks[evs['evs_name']] = evs
             self.ecs_attachments[ecs_data['ecs_name']].append(evs)
 
-    def add_servergroup_deps(self, server_groups: dict):
-        for group_name, group_data in server_groups.items():
-            for ecs_name in group_data['ecs_names']:
-                self.ecs_servergroup[ecs_name] = group_name
-
     def _disks_to_tfcode(self) -> str:
         renderer = Renderer()
         tf_code = ''
@@ -123,15 +117,7 @@ class Evs2Terraform:
         for ecs_name, disk_list in self.ecs_attachments.items():
             next_depends_on = None
             for evs_data in disk_list:
-                if next_depends_on is None:
-                    # first data attachment depends on servergroup
-                    # join to be complete, otherwise joining_server_group
-                    # error happens when attaching disk
-                    if ecs_name in self.ecs_servergroup:
-                        res = 'huaweicloud_compute_servergroup.servergroup_'
-                        res += self.ecs_servergroup[ecs_name]
-                        evs_data['depends_on'] = res
-                else:
+                if next_depends_on is not None:
                     # one attachment depends on the previous one to be
                     # finished, in order to ensure disk order
                     res = 'huaweicloud_compute_volume_attach.'

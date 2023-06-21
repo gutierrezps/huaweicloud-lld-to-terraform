@@ -40,18 +40,13 @@ class Ecs2Terraform:
         ecs_group = ecs_data.get('ecs_group', None)
 
         if ecs_group is None:
-            return None
+            return
 
         if ecs_group not in self._servergroups:
             self._servergroups[ecs_group] = {
                 'name': ecs_group,
-                'region': ecs_data['region'],
-                'ecs_names': []
+                'region': ecs_data['region']
             }
-
-        self._servergroups[ecs_group]['ecs_names'].append(ecs_data['ecs_name'])
-
-        return None
 
     def add_ecs(self, ecs_data: dict):
         ecs_name = clean_str(ecs_data['hostname'])
@@ -89,8 +84,7 @@ class Ecs2Terraform:
         {
             'group_name': {
                 'name': 'group_name',
-                'region': '...',
-                'ecs_names: ['srv01', 'srv02']
+                'region': '...'
         }
 
         Args:
@@ -104,14 +98,6 @@ class Ecs2Terraform:
         renderer = Renderer()
 
         for data in self._servergroups.values():
-            members = [
-                    f'huaweicloud_compute_instance.{name}.id'
-                    for name in data['ecs_names']
-                ]
-
-            # transform array into string and preserve tf_code indentation
-            data['members'] = ',\n    '.join(members)
-
             tf_code += renderer.render_name('templates/servergroup', data)
             tf_code += '\n'
 
@@ -133,8 +119,6 @@ class Ecs2Terraform:
 
         output_file.write(self._servergroups_to_tfcode())
 
-        self._nics_handler.add_servergroup_deps(self._servergroups)
         output_file.write(self._nics_handler.terraform_code())
 
-        self._evs_handler.add_servergroup_deps(self._servergroups)
         output_file.write(self._evs_handler.terraform_code())

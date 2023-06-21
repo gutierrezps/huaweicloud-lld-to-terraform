@@ -14,7 +14,6 @@ class Nics2Terraform:
 
     def __init__(self):
         self.ecs_nics = {}
-        self.ecs_servergroup = {}
 
         # Example virtual_ips data:
         # {
@@ -69,11 +68,6 @@ class Nics2Terraform:
         for i_nic in self.NIC_IDS:
             self._add_nic(ecs_data, i_nic)
             self._add_virtual_ip(ecs_data, i_nic)
-
-    def add_servergroup_deps(self, server_groups: dict):
-        for group_name, group_data in server_groups.items():
-            for ecs_name in group_data['ecs_names']:
-                self.ecs_servergroup[ecs_name] = group_name
 
     def _add_nic(self, ecs_data: dict, i_nic: int):
         nic_data = {}
@@ -139,17 +133,9 @@ class Nics2Terraform:
         next_depends_on = None
 
         for nic_data in self.ecs_nics[ecs_name]:
-            if next_depends_on is None:
-                # first nic attachment depends on servergroup
-                # join to be complete, otherwise joining_server_group
-                # error happens when attaching nic
-                if ecs_name in self.ecs_servergroup:
-                    res = 'huaweicloud_compute_servergroup.servergroup_'
-                    res += self.ecs_servergroup[ecs_name]
-                    nic_data['depends_on'] = res
-            else:
+            if next_depends_on is not None:
                 # one attachment depends on the previous one to be
-                # finished, in order to ensure disk order
+                # finished, in order to ensure NIC order
                 res = 'huaweicloud_compute_interface_attach.'
                 res += f'nic_{ next_depends_on }'
                 nic_data['depends_on'] = res

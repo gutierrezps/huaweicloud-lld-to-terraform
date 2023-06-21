@@ -2,7 +2,4 @@ resource "huaweicloud_compute_servergroup" "servergroup_{{ name }}" {
   region    = "{{ region }}"
   name      = "{{ name }}"
   policies  = ["anti-affinity"]
-  members   = [
-    {{ members }}
-  ]
 }
