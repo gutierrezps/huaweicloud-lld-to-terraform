@@ -10,7 +10,3 @@ data "huaweicloud_enterprise_project" "ep_prod" {
   name = "PROD"
 }
 
-data "huaweicloud_enterprise_project" "ep_net" {
-  name = "NET"
-}
-
