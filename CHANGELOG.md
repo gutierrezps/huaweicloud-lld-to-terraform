@@ -1,5 +1,9 @@
 # Changelog
 
+## [Unreleased]
+
+- Add Enterprise Project support
+
 ## [0.2.0] - 2023-04-08
 
 - New LLD template with more information;

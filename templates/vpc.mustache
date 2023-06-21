@@ -3,4 +3,7 @@ resource "huaweicloud_vpc" "{{ vpc }}" {
   name    = "{{ vpc_name }}"
   cidr    = "{{ ipv4_cidr_block }}"
   description = "{{ description }}"
+  {{#project}}
+  enterprise_project_id = data.huaweicloud_enterprise_project.ep_{{ project }}.id
+  {{/project}}
 }

@@ -51,6 +51,7 @@ For now, only the following resources are converted from LLD:
   - Multiple data disks
   - Shared disks
 - Server group (anti affinity)
+- Enterprise Project
 
 Future work will be done for more resources to be converted automatically from
 the LLD to Terraform code.

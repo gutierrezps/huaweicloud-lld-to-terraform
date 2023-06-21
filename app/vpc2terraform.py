@@ -9,6 +9,9 @@ class Vpc2Terraform:
         self._vpc = {}
 
     def add_vpc(self, vpc_data: dict):
+        if 'enterprise_project' in vpc_data:
+            vpc_data['project'] = clean_str(vpc_data['enterprise_project'])
+
         vpc = clean_str(vpc_data['vpc_name'])
         vpc_data['vpc'] = vpc
         if vpc in self._vpc:

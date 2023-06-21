@@ -5,6 +5,7 @@ from openpyxl import load_workbook
 from openpyxl.worksheet.worksheet import Worksheet
 
 from .ecs2terraform import Ecs2Terraform
+from .enterpriseproj2terraform import EnterpriseProj2Terraform
 from .secgroup2terraform import Secgroup2Terraform
 from .subnet2terraform import Subnet2Terraform
 from .utils import load_metadata, load_sheet_data
@@ -76,6 +77,18 @@ def process_secgroup(worksheet: Worksheet):
         secgroup_handler.output_terraform_code(output_file)
 
 
+def process_enterpriseproj(worksheet: Worksheet):
+    data = load_sheet_data(worksheet)
+
+    project_handler = EnterpriseProj2Terraform()
+
+    process_sheet_data(
+        worksheet.title, data, project_handler.add_project)
+
+    with open('tf/enterpriseproj.tf', 'w') as output_file:
+        project_handler.output_terraform_code(output_file)
+
+
 def main():
     metadata = load_metadata(METADATA_FILENAME)
     workbook = load_workbook(LLD_FILENAME, data_only=True)
@@ -87,6 +100,8 @@ def main():
     process_subnet(workbook[metadata['subnet_sheet']])
 
     process_secgroup(workbook[metadata['secgroup_sheet']])
+
+    process_enterpriseproj(workbook[metadata['enterprise_proj_sheet']])
 
 
 if __name__ == '__main__':

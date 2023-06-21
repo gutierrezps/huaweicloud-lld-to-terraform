@@ -3,6 +3,7 @@ resource "huaweicloud_vpc" "dev" {
   name    = "DEV"
   cidr    = "10.1.0.0/16"
   description = "Development"
+  enterprise_project_id = data.huaweicloud_enterprise_project.ep_dev.id
 }
 
 resource "huaweicloud_vpc" "stg" {
@@ -10,6 +11,7 @@ resource "huaweicloud_vpc" "stg" {
   name    = "STG"
   cidr    = "10.2.0.0/16"
   description = "Staging"
+  enterprise_project_id = data.huaweicloud_enterprise_project.ep_stg.id
 }
 
 resource "huaweicloud_vpc" "prod" {
@@ -17,6 +19,7 @@ resource "huaweicloud_vpc" "prod" {
   name    = "PROD"
   cidr    = "10.3.0.0/16"
   description = "Production"
+  enterprise_project_id = data.huaweicloud_enterprise_project.ep_prod.id
 }
 
 resource "huaweicloud_vpc" "net" {
@@ -24,6 +27,7 @@ resource "huaweicloud_vpc" "net" {
   name    = "NET"
   cidr    = "10.4.0.0/16"
   description = "Inter-network"
+  enterprise_project_id = data.huaweicloud_enterprise_project.ep_net.id
 }
 
 resource "huaweicloud_vpc_subnet" "dev_dev01" {
