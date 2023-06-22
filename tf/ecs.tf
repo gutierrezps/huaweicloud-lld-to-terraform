@@ -163,6 +163,7 @@ resource "huaweicloud_evs_volume" "evs_ecs_prod_01_data_1_shared" {
   volume_type       = "SSD"
   size              = 1024
   multiattach       = true
+  device_type       = "SCSI"
   enterprise_project_id = data.huaweicloud_enterprise_project.ep_prod.id
 
   tags = {
@@ -177,6 +178,7 @@ resource "huaweicloud_evs_volume" "evs_ecs_prod_01a_data_2" {
   volume_type       = "SAS"
   size              = 512
   multiattach       = false
+  device_type       = "VBD"
   enterprise_project_id = data.huaweicloud_enterprise_project.ep_prod.id
 
   tags = {
@@ -191,6 +193,7 @@ resource "huaweicloud_evs_volume" "evs_ecs_prod_01b_data_2" {
   volume_type       = "SAS"
   size              = 512
   multiattach       = false
+  device_type       = "VBD"
   enterprise_project_id = data.huaweicloud_enterprise_project.ep_prod.id
 
   tags = {
@@ -205,6 +208,7 @@ resource "huaweicloud_evs_volume" "evs_ecs_dev_data_1" {
   volume_type       = "SAS"
   size              = 512
   multiattach       = false
+  device_type       = "VBD"
   enterprise_project_id = data.huaweicloud_enterprise_project.ep_dev.id
 
   tags = {
@@ -219,6 +223,7 @@ resource "huaweicloud_evs_volume" "evs_ecs_dev_data_2" {
   volume_type       = "SAS"
   size              = 512
   multiattach       = false
+  device_type       = "VBD"
   enterprise_project_id = data.huaweicloud_enterprise_project.ep_dev.id
 
   tags = {

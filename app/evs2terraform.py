@@ -56,6 +56,7 @@ class Evs2Terraform:
             ):
         is_shared = evs_data['shared']
 
+        evs_data['device_type'] = 'VBD'
         evs_name = ecs_data['ecs_name']
         if is_shared:
             # ecs_name is the same for ECSs sharing the same data,
@@ -63,6 +64,7 @@ class Evs2Terraform:
             # so evs_name will be the ecs_name minus the last letter
             # for shared EVSs
             evs_name = ecs_data['ecs_name'][:-1]
+            evs_data['device_type'] = 'SCSI'
 
         evs_name = f'{evs_name}_data_{i_disk}'
         evs_name += '_shared' if is_shared else ''

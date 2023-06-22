@@ -5,9 +5,10 @@ resource "huaweicloud_evs_volume" "evs_{{ evs_name }}" {
   volume_type       = "{{ type }}"
   size              = {{ size }}
   multiattach       = {{ shared }}
-  {{#project}}
+  device_type       = "{{ device_type }}"
+  {{ #project }}
   enterprise_project_id = data.huaweicloud_enterprise_project.ep_{{ project }}.id
-  {{/project}}
+  {{ /project }}
 
   tags = {
     deployed_by   = "terraform"
