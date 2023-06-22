@@ -1,6 +1,6 @@
 # Changelog
 
-## [Unreleased]
+## [0.3.0] - 2023-06-22
 
 - **LLD**: Add Enterprise Project column to Security Group tag;
 - **LLD**: Renamed "Enterprise Project Name" column in ECS tab to "Enterprise
@@ -15,6 +15,10 @@
 - Refactored servergroup dependencies, now creating servergroup first and then
   configuring their ID in ECS scheduler hints. This also removed the dependency
   of first NIC and EVS with the servergroup;
+- Fix tags in ECS and EVS;
+- Add wave support;
+- Add Dedicated Host support;
+- Shared EVS now uses SCSI as device type (recommended by Console);
 - Fix some inconsistencies in LLD examples;
 
 ## [0.2.0] - 2023-04-08
