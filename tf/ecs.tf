@@ -167,7 +167,7 @@ resource "huaweicloud_evs_volume" "evs_ecs_prod_01_data_1_shared" {
   enterprise_project_id = data.huaweicloud_enterprise_project.ep_prod.id
 
   tags = {
-    deployed_by   = "terraform"
+    deployed_by = "terraform"
   }
 }
 
@@ -182,7 +182,7 @@ resource "huaweicloud_evs_volume" "evs_ecs_prod_01a_data_2" {
   enterprise_project_id = data.huaweicloud_enterprise_project.ep_prod.id
 
   tags = {
-    deployed_by   = "terraform"
+    deployed_by = "terraform"
   }
 }
 
@@ -197,7 +197,7 @@ resource "huaweicloud_evs_volume" "evs_ecs_prod_01b_data_2" {
   enterprise_project_id = data.huaweicloud_enterprise_project.ep_prod.id
 
   tags = {
-    deployed_by   = "terraform"
+    deployed_by = "terraform"
   }
 }
 
@@ -212,7 +212,7 @@ resource "huaweicloud_evs_volume" "evs_ecs_dev_data_1" {
   enterprise_project_id = data.huaweicloud_enterprise_project.ep_dev.id
 
   tags = {
-    deployed_by   = "terraform"
+    deployed_by = "terraform"
   }
 }
 
@@ -227,7 +227,7 @@ resource "huaweicloud_evs_volume" "evs_ecs_dev_data_2" {
   enterprise_project_id = data.huaweicloud_enterprise_project.ep_dev.id
 
   tags = {
-    deployed_by   = "terraform"
+    deployed_by = "terraform"
   }
 }
 

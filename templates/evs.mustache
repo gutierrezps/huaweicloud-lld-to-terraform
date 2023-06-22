@@ -9,8 +9,10 @@ resource "huaweicloud_evs_volume" "evs_{{ evs_name }}" {
   {{ #project }}
   enterprise_project_id = data.huaweicloud_enterprise_project.ep_{{ project }}.id
   {{ /project }}
+  {{ #tag }}
 
   tags = {
-    deployed_by   = "terraform"
+    {{ tag.key }} = "{{ tag.value }}"
   }
+  {{ /tag }}
 }

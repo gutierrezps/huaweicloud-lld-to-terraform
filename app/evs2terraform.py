@@ -59,11 +59,13 @@ class Evs2Terraform:
         evs_data['device_type'] = 'VBD'
         evs_name = ecs_data['ecs_name']
         if is_shared:
-            # ecs_name is the same for ECSs sharing the same data,
-            # except for the last letter (e.g. srv01a, srv01b),
-            # so evs_name will be the ecs_name minus the last letter
-            # for shared EVSs
+            # ecs_name is expected to be the same for ECSs sharing the
+            # same data, except for the last letter (e.g. srv01a, srv01b),
+            # so evs_name will contain the ecs_name minus the last
+            # letter for shared EVSs (e.g. srv01)
             evs_name = ecs_data['ecs_name'][:-1]
+
+            # SCSI device type is recommended for shared disks
             evs_data['device_type'] = 'SCSI'
 
         evs_name = f'{evs_name}_data_{i_disk}'
@@ -73,12 +75,14 @@ class Evs2Terraform:
         device = '/dev/vd' + chr(ord('a') + i_disk)
         evs_data['evs_device'] = device
 
-        COPY_PARAMS = ['ecs_name', 'region', 'az']
-        for param in COPY_PARAMS:
+        COPY_PARAMS_MANDATORY = ['ecs_name', 'region', 'az']
+        for param in COPY_PARAMS_MANDATORY:
             evs_data[param] = ecs_data[param]
 
-        if 'project' in ecs_data:
-            evs_data['project'] = ecs_data['project']
+        COPY_PARAMS_OPTIONAL = ['tag', 'project']
+        for param in COPY_PARAMS_OPTIONAL:
+            if param in ecs_data:
+                evs_data[param] = ecs_data[param]
 
         # Terraform bool is all lowercase
         evs_data['shared'] = str(is_shared).lower()
