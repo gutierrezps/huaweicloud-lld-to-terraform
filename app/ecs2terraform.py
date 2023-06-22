@@ -25,6 +25,14 @@ class Ecs2Terraform:
             dict: output ecs data
         """
         ecs_data = self._nics_handler.transform_params(ecs_data)
+
+        tag_key = ecs_data.pop('tag_key', None)
+        if tag_key is not None:
+            ecs_data['tag'] = {
+                'key': tag_key,
+                'value': ecs_data['tag_value']
+            }
+
         return ecs_data
 
     def _validate_ecs(self, ecs_data: dict):

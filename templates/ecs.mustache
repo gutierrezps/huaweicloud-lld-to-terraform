@@ -26,8 +26,10 @@ resource "huaweicloud_compute_instance" "{{ ecs_name }}" {
     group         = huaweicloud_compute_servergroup.servergroup_{{ ecs_group }}.id
   }
   {{/ecs_group}}
+  {{#tag}}
 
   tags = {
-    deployed_by   = "terraform"
+    {{tag.key}}   = "{{tag.value}}"
   }
+  {{/tag}}
 }

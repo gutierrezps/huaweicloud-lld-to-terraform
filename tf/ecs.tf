@@ -94,10 +94,6 @@ resource "huaweicloud_compute_instance" "ecs_stg" {
     fixed_ip_v4       = "10.2.1.21"
     source_dest_check = true
   }
-
-  tags = {
-    deployed_by   = "terraform"
-  }
 }
 
 resource "huaweicloud_compute_servergroup" "servergroup_group01" {
