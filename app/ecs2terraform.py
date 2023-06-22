@@ -24,6 +24,8 @@ class Ecs2Terraform:
         Returns:
             dict: output ecs data
         """
+        ecs_data['ecs_name'] = clean_str(ecs_data['hostname'])
+
         ecs_data = self._nics_handler.transform_params(ecs_data)
 
         tag_key = ecs_data.pop('tag_key', None)
@@ -32,6 +34,10 @@ class Ecs2Terraform:
                 'key': tag_key,
                 'value': ecs_data['tag_value']
             }
+
+        project = ecs_data.pop('enterprise_project', None)
+        if project is not None:
+            ecs_data['project'] = clean_str(project)
 
         return ecs_data
 
@@ -57,12 +63,6 @@ class Ecs2Terraform:
             }
 
     def add_ecs(self, ecs_data: dict):
-        ecs_name = clean_str(ecs_data['hostname'])
-        ecs_data['ecs_name'] = ecs_name
-
-        if 'enterprise_project' in ecs_data:
-            ecs_data['project'] = clean_str(ecs_data['enterprise_project'])
-
         ecs_data = self._transform_params(ecs_data)
 
         functions = [
@@ -80,7 +80,7 @@ class Ecs2Terraform:
         nic1_has_vip = self._nics_handler.has_vip(ecs_data['nic1_fixed_ip'])
         ecs_data['source_dest_check'] = str(not nic1_has_vip).lower()
 
-        self._ecs[ecs_name] = ecs_data
+        self._ecs[ecs_data['ecs_name']] = ecs_data
 
         return None
 
