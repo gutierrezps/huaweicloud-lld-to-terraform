@@ -20,12 +20,17 @@ resource "huaweicloud_compute_instance" "{{ ecs_name }}" {
     fixed_ip_v4       = "{{ nic1_fixed_ip }}"
     source_dest_check = {{ source_dest_check }}
   }
-  {{#ecs_group}}
+  {{#scheduler_hints}}
 
   scheduler_hints {
-    group         = huaweicloud_compute_servergroup.servergroup_{{ ecs_group }}.id
+    {{#scheduler_hints.group}}
+    group         = huaweicloud_compute_servergroup.servergroup_{{ scheduler_hints.group }}.id
+    {{/scheduler_hints.group}}
+    {{#scheduler_hints.tenancy}}
+    tenancy       = "{{ scheduler_hints.tenancy }}"
+    {{/scheduler_hints.tenancy}}
   }
-  {{/ecs_group}}
+  {{/scheduler_hints}}
   {{#tag}}
 
   tags = {

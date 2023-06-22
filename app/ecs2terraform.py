@@ -23,7 +23,7 @@ class Ecs2Terraform:
             ecs_data (dict): input ecs data
 
         Returns:
-            dict: output ecs data
+            dict: output ecs data, with transformations applied
         """
         ecs_data['ecs_name'] = clean_str(ecs_data['hostname'])
 
@@ -39,6 +39,15 @@ class Ecs2Terraform:
         project = ecs_data.pop('enterprise_project', None)
         if project is not None:
             ecs_data['project'] = clean_str(project)
+
+        group = ecs_data.get('ecs_group', None)
+        dedicated_host = ecs_data.pop('dedicated_host', None)
+        if group or dedicated_host:
+            tenancy = 'dedicated' if dedicated_host == 'yes' else None
+            ecs_data['scheduler_hints'] = {
+                'group': group,
+                'tenancy': tenancy
+            }
 
         return ecs_data
 
