@@ -7,11 +7,12 @@ from .utils import clean_str
 
 
 class Ecs2Terraform:
-    def __init__(self):
+    def __init__(self, last_wave: int):
         self._ecs = {}
         self._servergroups = {}
         self._nics_handler = Nics2Terraform()
         self._evs_handler = Evs2Terraform()
+        self._last_wave = last_wave
 
     def _transform_params(self, ecs_data: dict) -> dict:
         """Apply transformations to the ecs parameters.
@@ -64,6 +65,13 @@ class Ecs2Terraform:
 
     def add_ecs(self, ecs_data: dict):
         ecs_data = self._transform_params(ecs_data)
+
+        # ECSs will be ignored if "Wave" value is not set, if it's
+        # negative or if it's greather than "ECS last wave"
+        # in metadata.xlsx
+        ecs_wave = ecs_data.pop('wave', 0)
+        if ecs_wave <= 0 or ecs_wave > self._last_wave:
+            return
 
         functions = [
             self._validate_ecs,

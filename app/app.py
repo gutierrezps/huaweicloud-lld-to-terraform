@@ -32,10 +32,10 @@ def process_sheet_data(
             exit()
 
 
-def process_ecs(worksheet: Worksheet):
+def process_ecs(worksheet: Worksheet, last_wave: int):
     data = load_sheet_data(worksheet)
 
-    ecs_handler = Ecs2Terraform()
+    ecs_handler = Ecs2Terraform(last_wave)
 
     process_sheet_data(worksheet.title, data, ecs_handler.add_ecs)
 
@@ -93,7 +93,14 @@ def main():
     metadata = load_metadata(METADATA_FILENAME)
     workbook = load_workbook(LLD_FILENAME, data_only=True)
 
-    process_ecs(workbook[metadata['ecs_sheet']])
+    # load and validate "ECS last wave"
+    try:
+        last_wave = int(metadata['ecs_last_wave'])
+        assert last_wave > 0
+    except (ValueError, AssertionError):
+        print('[ERR] Invalid ECS last wave value (must be a number > 0)')
+
+    process_ecs(workbook[metadata['ecs_sheet']], last_wave)
 
     process_vpc(workbook[metadata['vpc_sheet']])
 

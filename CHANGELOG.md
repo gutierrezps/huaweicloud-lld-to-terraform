@@ -7,6 +7,9 @@
   Project";
 - **LLD**: Removed "Password or Keypair" column in ECS tab, because "OS
   Password" is mandatory in order to set a keypair;
+- **metadata**: Added "ECS last wave" parameter;
+- **LLD**: ECS Wave column now mandatory, if wave is negative or larger than
+  "ECS last wave" parameter, the ECS will be ignored;
 - Add Enterprise Project support to VPC, security group, ECS and EVS;
 - Refactored servergroup dependencies, now creating servergroup first and then
   configuring their ID in ECS scheduler hints. This also removed the dependency
