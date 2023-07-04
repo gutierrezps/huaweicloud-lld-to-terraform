@@ -26,6 +26,8 @@ def process_sheet_data(
             error = handler_method(row_data)
         except KeyError as e:
             error = 'mandatory column "' + e.args[0] + '" not set'
+        except ValueError as e:
+            error = e.args[0]
 
         if error is not None:
             print(f'[ERR] Sheet "{sheet_title}", row {row_number}: {error}')
