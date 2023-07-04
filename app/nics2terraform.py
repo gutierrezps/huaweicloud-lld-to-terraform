@@ -187,6 +187,10 @@ class Nics2Terraform:
     def has_vip(self, fixed_ip: str) -> bool:
         return fixed_ip in self.ips_with_vips
 
+    def get_secgroups(self, ecs_name: str) -> list:
+        secgroups = [nic['security_group'] for nic in self.ecs_nics[ecs_name]]
+        return secgroups
+
     def terraform_code(self):
         renderer = Renderer()
         tf_code = ''

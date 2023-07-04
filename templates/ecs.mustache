@@ -2,7 +2,9 @@ resource "huaweicloud_compute_instance" "{{ ecs_name }}" {
   name                = "{{ hostname }}"
   image_id            = "{{ image_id }}"
   flavor_id           = "{{ flavor }}"
-  security_group_ids  = [ huaweicloud_networking_secgroup.{{ nic1_security_group }}.id ]
+  security_group_ids  = [
+    {{{ security_groups }}}
+  ]
   region              = "{{ region }}"
   availability_zone   = "{{ az }}"
   admin_pass          = "{{ os_password }}"

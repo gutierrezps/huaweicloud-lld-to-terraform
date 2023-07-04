@@ -74,6 +74,7 @@ class Ecs2Terraform:
 
     def add_ecs(self, ecs_data: dict):
         ecs_data = self._transform_params(ecs_data)
+        ecs_name = ecs_data['ecs_name']
 
         # ECSs will be ignored if "Wave" value is not set, if it's
         # negative or if it's greather than "ECS last wave"
@@ -97,7 +98,11 @@ class Ecs2Terraform:
         nic1_has_vip = self._nics_handler.has_vip(ecs_data['nic1_fixed_ip'])
         ecs_data['source_dest_check'] = str(not nic1_has_vip).lower()
 
-        self._ecs[ecs_data['ecs_name']] = ecs_data
+        secgroups = [ecs_data['nic1_security_group']]
+        secgroups.extend(self._nics_handler.get_secgroups(ecs_name))
+        ecs_data['security_groups'] = secgroups
+
+        self._ecs[ecs_name] = ecs_data
 
         return None
 
@@ -138,6 +143,11 @@ class Ecs2Terraform:
         renderer = Renderer()
 
         for ecs_data in self._ecs.values():
+            secgroups = [
+                f'huaweicloud_networking_secgroup.{secgroup}.id'
+                for secgroup in ecs_data['security_groups']
+            ]
+            ecs_data['security_groups'] = ',\n    '.join(secgroups)
             tf_code = renderer.render_name('templates/ecs', ecs_data)
             tf_code += '\n'
             output_file.write(tf_code)
