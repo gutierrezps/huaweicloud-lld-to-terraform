@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.3.1] - 2023-07-04
+
+- Fix different security groups for different NICs not being set in
+  `security_group_ids` of ECS resource;
+- Fix ValueError exception not being handled.
+
 ## [0.3.0] - 2023-06-22
 
 - **LLD**: Add Enterprise Project column to Security Group tag;
