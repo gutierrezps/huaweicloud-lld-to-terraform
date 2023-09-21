@@ -39,7 +39,7 @@ resources to be changed and/or destroyed.
    data in the LLD
 3. Activate the Conda virtual environment (if not already active):
    `conda activate lld-tf`
-4. Run the Python script in the project's root directory: `python -m app.app`
+4. Run the Python script in the project's root directory: `python -m app`
 5. Check the Terraform code generated inside `tf` folder
 
 ## Automatic conversion and manual work
