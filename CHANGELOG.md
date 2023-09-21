@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.3.2] - 2023-09-21
+
+- Add [LLD documentation](docs/LLD.md);
+- Renamed `app.py` to `__main__.py`, command now is `python -m app`;
+- Updated Terraform provider version to 1.55.0;
+- Small cosmetic updates in the LLD spreadsheet (and added comment metadata
+  with repository link and version).
+
 ## [0.3.1] - 2023-07-04
 
 - Fix different security groups for different NICs not being set in
