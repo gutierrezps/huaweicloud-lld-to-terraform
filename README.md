@@ -1,8 +1,10 @@
-# Huawei Cloud LLD to Terraform
+# HUAWEI CLOUD LLD to Terraform
 
 This repository contains Python scripts to convert project infrastruture
-described by a Low-Level Design (LLD) spreadsheet into Huawei Cloud Terraform
+described by a Low-Level Design (LLD) spreadsheet into HUAWEI CLOUD Terraform
 code.
+
+See the [LLD documentation](docs/LLD.md) to learn how to fill the spreadsheet.
 
 ## DISCLAIMER
 
@@ -32,6 +34,7 @@ resources to be changed and/or destroyed.
 ## LLD to Terraform conversion
 
 1. Fill the infrastructure information in the `LLD.xlsx`
+  ([LLD documentation](docs/LLD.md))
 2. Fill the LLD metadata in `metadata.xlsx`, used to tell where to look for
    data in the LLD
 3. Activate the Conda virtual environment (if not already active):
@@ -69,7 +72,7 @@ editor to review it before applying.
 
 ## References
 
-- Huawei Cloud Terraform provider documentation:
+- HUAWEI CLOUD Terraform provider documentation:
   <https://registry.terraform.io/providers/huaweicloud/huaweicloud/latest/docs>
 - Regions and Availability Zones:
   <https://developer.huaweicloud.com/intl/en-us/endpoint>
