@@ -17,3 +17,21 @@ resource "huaweicloud_vpc_eip" "eip_dev01" {
   }
 }
 
+resource "huaweicloud_vpc_eip" "eip_stg" {
+  region  = "sa-brazil-1"
+  name    = "eip-stg"
+
+  charging_mode = "postPaid"
+
+  publicip {
+    type = "5_bgp"
+  }
+
+  bandwidth {
+    share_type  = "PER"
+    name        = "bandwidth_eip-stg"
+    size        = 
+    charge_mode = ""
+  }
+}
+

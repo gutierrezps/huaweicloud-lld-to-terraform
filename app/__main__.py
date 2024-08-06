@@ -5,9 +5,11 @@ from openpyxl import load_workbook
 from openpyxl.worksheet.worksheet import Worksheet
 
 from .ecs2terraform import Ecs2Terraform
-from .enterpriseproj2terraform import EnterpriseProj2Terraform
-from .secgroup2terraform import Secgroup2Terraform
 from .eip2terraform import Eip2Terraform
+from .enterpriseproj2terraform import EnterpriseProj2Terraform
+from .nat2terraform import Nat2Terraform
+from .natrule2terraform import NatRule2Terraform
+from .secgroup2terraform import Secgroup2Terraform
 from .subnet2terraform import Subnet2Terraform
 from .utils import load_metadata, load_sheet_data
 from .vpc2terraform import Vpc2Terraform
@@ -91,6 +93,30 @@ def process_eip(worksheet: Worksheet):
         eip_handler.output_terraform_code(output_file)
 
 
+def process_nat(worksheet: Worksheet):
+    data = load_sheet_data(worksheet)
+
+    nat_handler = Nat2Terraform()
+
+    process_sheet_data(worksheet.title, data, nat_handler.append)
+
+    with open('tf/nat.tf', 'w') as output_file:
+        nat_handler.output_terraform_code(output_file)
+
+    return nat_handler.to_dict()
+
+
+def process_nat_rules(worksheet: Worksheet, nat_data: dict):
+    data = load_sheet_data(worksheet)
+
+    rule_handler = NatRule2Terraform(nat_data)
+
+    process_sheet_data(worksheet.title, data, rule_handler.append)
+
+    with open('tf/nat.tf', 'a') as output_file:
+        rule_handler.output_terraform_code(output_file)
+
+
 def process_enterpriseproj(worksheet: Worksheet):
     data = load_sheet_data(worksheet)
 
@@ -123,6 +149,10 @@ def main():
     process_secgroup(workbook[metadata['secgroup_sheet']])
 
     process_eip(workbook[metadata['eip_sheet']])
+
+    nat_data = process_nat(workbook[metadata['nat_sheet']])
+
+    process_nat_rules(workbook[metadata['nat_rules_sheet']], nat_data)
 
     process_enterpriseproj(workbook[metadata['enterprise_proj_sheet']])
 
