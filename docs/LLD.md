@@ -1,16 +1,22 @@
 # Low-Level Design (LLD)
 
-This document contains the description of each tab in the LLD.xlsx spreadsheet
+This document contains the description of each tab in the `LLD.xlsx` spreadsheet
 and the associated arguments reference.
 
-## Table of Contents
-
-1. [General orientations](#general-orientations)
-2. [Enterprise Project](#enterprise-project)
-3. [Virtual Private Cloud (VPC)](#virtual-private-cloud-vpc)
-4. [Subnet](#subnet)
-5. [Security Group](#security-group-secgroup)
-6. [Elastic Cloud Server (ECS)](#elastic-cloud-server-ecs)
+- [Low-Level Design (LLD)](#low-level-design-lld)
+  - [General orientations](#general-orientations)
+  - [Enterprise Project](#enterprise-project)
+    - [EPS Argument Reference](#eps-argument-reference)
+  - [Virtual Private Cloud (VPC)](#virtual-private-cloud-vpc)
+    - [VPC Argument Reference](#vpc-argument-reference)
+  - [Subnet](#subnet)
+    - [Subnet Argument Reference](#subnet-argument-reference)
+  - [Security Group (secgroup)](#security-group-secgroup)
+    - [Secgroup Argument Reference](#secgroup-argument-reference)
+  - [Elastic IP (EIP)](#elastic-ip-eip)
+    - [EIP Argument Reference](#eip-argument-reference)
+  - [Elastic Cloud Server (ECS)](#elastic-cloud-server-ecs)
+    - [ECS Argument Reference](#ecs-argument-reference)
 
 ## General orientations
 
@@ -171,6 +177,32 @@ security group rules.
   where the security group will be created. If this argument is set, the
   enterprise project must be specified in the associated spreadsheet tab.
 
+## Elastic IP (EIP)
+
+An [Elastic IP (EIP)][eip] is a public IP address that can be accessed directly
+over the Internet. An EIP consists of a public IP address and some amount of
+public network egress bandwidth. EIPs can be bound to or unbound from ECSs,
+BMSs, virtual IP addresses, NAT gateways, and load balancers.
+
+Each row of the spreadsheet corresponds to one EIP address.
+
+### EIP Argument Reference
+
+- **SN** - (optional, not used) Serial number, only for reference.
+- **Region** - (required, force new) Region code (e.g. `sa-brazil-1`) in which
+  to create the VPC. See [Regions and Endpoints][endpoints] to get the desired
+  region code.
+- **EIP Name** - (required, resource name) Name of the EIP, which is also used
+  to compose the bandwidth name. The value is a string of no more than 64
+  characters and can contain digits, letters, underscores (_), and hyphens (-).
+- **Charge Mode** - (required) Specifies whether the bandwidth is billed by
+  traffic or by bandwidth size. The value can be `traffic` or `bandwidth`.
+- **Size Mbit** - (required) Bandwidth size in Mbit/s. Valid value is integer
+  from 1 to 300.
+- **Enterprise Project** - (optional, force new) Name of enterprise project
+  where the Elastic IP will be created. If this argument is set, the
+  enterprise project must be specified in the associated spreadsheet tab.
+
 ## Elastic Cloud Server (ECS)
 
 An [Elastic Cloud Server (ECS)][ecs] is a basic computing unit that consists of
@@ -233,7 +265,7 @@ Each row of the spreadsheet corresponds to one ECS.
 Each ECS can have up to 8 Network Interface Cards (NICs). Replace `#` in the
 argument name by the NIC index, between 1 and 8. NIC1 information is required,
 while NIC2 onward is optional. Only NIC1 and NIC2 columns are present in the
-default LLD.xlsx file, more columns can be added for other NICs, always
+default `LLD.xlsx` file, more columns can be added for other NICs, always
 following the same pattern. Each ECS flavor has a different number of maximum
 NICs that are supported, [check the documentation][ecs-flavors].
 
@@ -263,7 +295,7 @@ System disk specifications:
 
 Each ECS can have up to 23 EVS data disks. Replace `#` in the argument name by
 the EVS index, between 1 and 23. Only data disk 1 and 2 columns are present in
-the default LLD.xlsx file, more columns can be added for other data disks,
+the default `LLD.xlsx` file, more columns can be added for other data disks,
 always following the same pattern. Data disks are optional.
 
 - **Data Disk # Type** - (required, force new) Disk type code. Valid values
@@ -289,3 +321,4 @@ always following the same pattern. Data disks are optional.
 [kps]: <https://support.huaweicloud.com/intl/en-us/usermanual-dew/dew_01_0034.html>
 [ecs-flavors]: <https://support.huaweicloud.com/intl/en-us/productdesc-ecs/ecs_01_0014.html>
 [vip]: <https://support.huaweicloud.com/intl/en-us/productdesc-vpc/vpc_Concepts_0012.html>
+[eip]: <https://support.huaweicloud.com/intl/en-us/productdesc-eip/overview_0001.html>

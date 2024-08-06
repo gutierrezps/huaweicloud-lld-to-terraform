@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- Add EIP support
+
 ## [0.3.2] - 2023-09-21
 
 - Add [LLD documentation](docs/LLD.md);
