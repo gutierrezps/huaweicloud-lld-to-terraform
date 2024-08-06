@@ -1,0 +1,12 @@
+resource "huaweicloud_nat_snat_rule" "{{ rule }}" {
+  region          = huaweicloud_nat_gateway.{{ nat }}.region
+  nat_gateway_id  = huaweicloud_nat_gateway.{{ nat }}.id
+  floating_ip_id  = huaweicloud_vpc_eip.{{ eip }}.id
+  description     = "{{ description }}"
+  {{#subnet}}
+  subnet_id       = huaweicloud_vpc_subnet.{{ subnet }}.id
+  {{/subnet}}
+  {{#cidr}}
+  cidr            = "{{ cidr }}"
+  {{/cidr}}
+}

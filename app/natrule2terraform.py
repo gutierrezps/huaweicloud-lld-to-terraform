@@ -1,4 +1,6 @@
+import re
 from io import TextIOWrapper
+
 from pystache import Renderer
 
 from .utils import clean_str
@@ -19,10 +21,19 @@ class NatRule2Terraform:
         nat = clean_str(rule_data['nat_name'])
         rule_data['nat'] = nat
 
+        subnet = self._nat_data[nat]['vpc'] + '_'
+
         if rule_type == 'dnat':
-            subnet = self._nat_data[nat]['vpc'] + '_'
             subnet += clean_str(rule_data['dnat_subnet_name'])
             rule_data['subnet'] = subnet
+        else:
+            dest = rule_data['snat_cidr_subnet'].strip()
+
+            if re.match(r'(\d{1,3}\.){3}\d{1,3}\/\d{1,2}', dest) is not None:
+                rule_data['cidr'] = dest
+            else:
+                subnet += clean_str(dest)
+                rule_data['subnet'] = subnet
 
         eip = clean_str(rule_data['eip_name'])
         rule_data['eip'] = eip
@@ -30,7 +41,7 @@ class NatRule2Terraform:
         self._nat_rule.append(rule_data)
 
     def output_terraform_code(self, output_file: TextIOWrapper):
-        """Transforms all NAT data into Terraform code, and save to
+        """Transforms all NAT rules data into Terraform code, and save to
         output_file.
 
         Args:
