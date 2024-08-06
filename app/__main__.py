@@ -7,6 +7,7 @@ from openpyxl.worksheet.worksheet import Worksheet
 from .ecs2terraform import Ecs2Terraform
 from .enterpriseproj2terraform import EnterpriseProj2Terraform
 from .secgroup2terraform import Secgroup2Terraform
+from .eip2terraform import Eip2Terraform
 from .subnet2terraform import Subnet2Terraform
 from .utils import load_metadata, load_sheet_data
 from .vpc2terraform import Vpc2Terraform
@@ -79,6 +80,17 @@ def process_secgroup(worksheet: Worksheet):
         secgroup_handler.output_terraform_code(output_file)
 
 
+def process_eip(worksheet: Worksheet):
+    data = load_sheet_data(worksheet)
+
+    eip_handler = Eip2Terraform()
+
+    process_sheet_data(worksheet.title, data, eip_handler.add_eip)
+
+    with open('tf/eips.tf', 'w') as output_file:
+        eip_handler.output_terraform_code(output_file)
+
+
 def process_enterpriseproj(worksheet: Worksheet):
     data = load_sheet_data(worksheet)
 
@@ -109,6 +121,8 @@ def main():
     process_subnet(workbook[metadata['subnet_sheet']])
 
     process_secgroup(workbook[metadata['secgroup_sheet']])
+
+    process_eip(workbook[metadata['eip_sheet']])
 
     process_enterpriseproj(workbook[metadata['enterprise_proj_sheet']])
 
