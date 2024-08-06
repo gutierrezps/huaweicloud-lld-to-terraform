@@ -4,6 +4,7 @@ data "huaweicloud_networking_port" "{{ rule }}_port" {
 }
 
 resource "huaweicloud_nat_dnat_rule" "{{ rule }}" {
+  region                = huaweicloud_nat_gateway.{{ nat }}.region
   nat_gateway_id        = huaweicloud_nat_gateway.{{ nat }}.id
   floating_ip_id        = huaweicloud_vpc_eip.{{ eip }}.id
   port_id               = data.huaweicloud_networking_port.{{ rule }}_port.port_id

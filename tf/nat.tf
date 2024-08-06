@@ -14,6 +14,7 @@ data "huaweicloud_networking_port" "dnat_rule01_port" {
 }
 
 resource "huaweicloud_nat_dnat_rule" "dnat_rule01" {
+  region                = huaweicloud_nat_gateway.nat_gw.region
   nat_gateway_id        = huaweicloud_nat_gateway.nat_gw.id
   floating_ip_id        = huaweicloud_vpc_eip.eip_dev01.id
   port_id               = data.huaweicloud_networking_port.dnat_rule01_port.port_id
