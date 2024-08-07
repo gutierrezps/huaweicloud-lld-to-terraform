@@ -13,7 +13,7 @@ resource "huaweicloud_vpc_eip" "{{ eip }}" {
 
   bandwidth {
     share_type  = "PER"
-    name        = "bandwidth_{{ eip_name }}"
+    name        = "bandwidth-{{ eip_name }}"
     size        = {{ size_mbit }}
     charge_mode = "{{ charge_mode }}"
   }
