@@ -17,6 +17,7 @@ and the associated arguments reference.
     - [EIP Argument Reference](#eip-argument-reference)
   - [NAT Gateway](#nat-gateway)
     - [Public NAT Gateway instance Argument Reference](#public-nat-gateway-instance-argument-reference)
+    - [NAT Rules Argument Reference](#nat-rules-argument-reference)
   - [Elastic Cloud Server (ECS)](#elastic-cloud-server-ecs)
     - [ECS Argument Reference](#ecs-argument-reference)
 
@@ -241,6 +242,42 @@ specified NAT Gateway.
 - **Enterprise Project** - (optional, force new) Name of enterprise project
   where the NAT gateway will be created. If this argument is set, the
   enterprise project must be specified in the associated spreadsheet tab.
+
+### NAT Rules Argument Reference
+
+- **SN** - (optional, not used) Serial number, only for reference.
+- **NAT Name** - (required, resource name) Name of the NAT Gateway specified in
+  the associated spreadsheet tab.
+- **Rule Type** - (required, force new) Direction of the rule, valid
+  values are **DNAT** (inbound/ingress) and **SNAT** (outbound/egress).
+- **EIP Name** - (required, force new) Name of the EIP specified in the
+  associated spreadsheet tab. Changing this creates a new NAT rule.
+- **Description** - (optional) Supplementary information about the NAT rule.
+  This parameter can contain a maximum of 255 characters and cannot contain
+  angle brackets (< or >).
+
+For DNAT rules, the following arguments are supported:
+
+> Before creating a DNAT rule, make sure the resource is already created in the
+> target subnet, otherwise the following error message will be displayed when
+> applying changes: `Error: no networking port found`. If this happens,
+> run the Terraform command again.
+
+- **DNAT External Port** - (required) Specifies port used in EIP to provide
+  services for external systems.
+- **DNAT Subnet Name** - (required) Name of the subnet specified in the
+  associated spreadsheet tab. Subnet where the resource is located.
+- **DNAT Internal IP** - (required) Private IP address of the resource, already
+  existing in the subnet.
+- **DNAT Internal Port** - (required) Specifies port used by resource (e.g. ECS)
+  to provide services for external systems.
+
+For SNAT rules, the following arguments are supported:
+
+- **SNAT CIDR/subnet** - (required, force new) Specify the CIDR block (e.g.
+  `10.0.0.0/8`) or the subnet name (specified in the associated spreadsheet tab)
+  which will be connected by SNAT rule. Changing this will create a new SNAT
+  rule.
 
 ## Elastic Cloud Server (ECS)
 

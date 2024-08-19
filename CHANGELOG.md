@@ -3,6 +3,7 @@
 ## Unreleased
 
 - Add EIP support
+- Add NAT Gateway and NAT rules support
 
 ## [0.3.2] - 2023-09-21
 
