@@ -11,7 +11,7 @@ resource "huaweicloud_vpc_eip" "eip_dev01_inbound" {
 
   bandwidth {
     share_type  = "PER"
-    name        = "bandwidth_eip-dev01-inbound"
+    name        = "bandwidth-eip-dev01-inbound"
     size        = 100
     charge_mode = "traffic"
   }
@@ -30,7 +30,7 @@ resource "huaweicloud_vpc_eip" "eip_dev01_outbound" {
 
   bandwidth {
     share_type  = "PER"
-    name        = "bandwidth_eip-dev01-outbound"
+    name        = "bandwidth-eip-dev01-outbound"
     size        = 100
     charge_mode = "traffic"
   }
