@@ -1,9 +1,11 @@
 # Changelog
 
-## Unreleased
+## [0.4.0] - 2024-08-19
 
-- Add EIP support
-- Add NAT Gateway and NAT rules support
+- **LLD**: Add EIP, NAT Gateway and NAT rules support;
+- **metadata**: Add parameters for EIP, NAT and NATrules sheet names;
+- Create separate files for provider configuration and variables (fix #1);
+- Updated Terraform provider version to 1.67.1.
 
 ## [0.3.2] - 2023-09-21
 
