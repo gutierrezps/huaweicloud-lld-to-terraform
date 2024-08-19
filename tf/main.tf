@@ -1,24 +1,14 @@
-terraform {
-  required_providers {
-    huaweicloud = {
-      source  = "huaweicloud/huaweicloud"
-      version = "1.67.1"
-    }
-  }
-}
-
-# AK, SK and Region configured in terraform.tfvars
-variable "hwcloud_region" { type = string }
-variable "hwcloud_ak" { type = string }
-variable "hwcloud_sk" { type = string }
-
-provider "huaweicloud" {
-  region     = var.hwcloud_region
-  access_key = var.hwcloud_ak
-  secret_key = var.hwcloud_sk
-}
-
-locals {
-  all_ipv4        = "0.0.0.0/0"
-  all_ipv6        = "::/0"
-}
+#
+# Files generated automatically by Python tool:
+#
+# - ecs.tf -- Elastic Cloud Servers (ECS), with their Network Interface
+#    Cards (NICs) and their Elastic Volume Server (EVS) disks
+# - eips.tf -- Elastic IPs (EIPs)
+# - enterpriseproj.tf -- Enterprise Projects
+# - nat.tf -- NAT Gateways and SNAT/DNAT rules
+# - secgroups.tf -- Security Groups and their rules
+# - vpc_subnet.tf -- Virtual Private Cloud (VPC) and their subnets
+#
+# Do not edit them manually, otherwise changes will be lost when you run
+# the Python tool
+#
