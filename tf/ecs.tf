@@ -105,8 +105,8 @@ resource "huaweicloud_compute_instance" "ecs_stg" {
     source_dest_check = true
   }
 
-  scheduler_hints {
-    tenancy       = "dedicated"
+  tags = {
+    deployed_by   = "terraform"
   }
 }
 

@@ -1,0 +1,20 @@
+resource "huaweicloud_vpc_eip" "{{ eip }}" {
+  region  = "{{ region }}"
+  name    = "{{ eip_name }}"
+  {{#project}}
+  enterprise_project_id = data.huaweicloud_enterprise_project.ep_{{ project }}.id
+  {{/project}}
+
+  charging_mode = "postPaid"
+
+  publicip {
+    type = "5_bgp"
+  }
+
+  bandwidth {
+    share_type  = "PER"
+    name        = "bandwidth-{{ eip_name }}"
+    size        = {{ size_mbit }}
+    charge_mode = "{{ charge_mode }}"
+  }
+}

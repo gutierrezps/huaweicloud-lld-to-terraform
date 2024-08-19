@@ -1,0 +1,14 @@
+resource "huaweicloud_nat_gateway" "{{ nat }}" {
+  region      = "{{ region }}"
+  name        = "{{ nat_name }}"
+  description = "{{ description }}"
+  spec        = "{{ scale }}"
+  vpc_id      = huaweicloud_vpc.{{ vpc }}.id
+  subnet_id   = huaweicloud_vpc_subnet.{{ subnet }}.id
+  {{#private_ip}}
+  ngport_ip_address   = "{{ private_ip }}"
+  {{/private_ip}}
+  {{#project}}
+  enterprise_project_id = data.huaweicloud_enterprise_project.ep_{{ project }}.id
+  {{/project}}
+}

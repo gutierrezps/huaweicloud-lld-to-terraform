@@ -1,0 +1,15 @@
+data "huaweicloud_networking_port" "{{ rule }}_port" {
+  network_id = huaweicloud_vpc_subnet.{{ subnet }}.id
+  fixed_ip   = "{{ dnat_internal_ip }}"
+}
+
+resource "huaweicloud_nat_dnat_rule" "{{ rule }}" {
+  region                = huaweicloud_nat_gateway.{{ nat }}.region
+  nat_gateway_id        = huaweicloud_nat_gateway.{{ nat }}.id
+  floating_ip_id        = huaweicloud_vpc_eip.{{ eip }}.id
+  description           = "{{ description }}"
+  port_id               = data.huaweicloud_networking_port.{{ rule }}_port.port_id
+  protocol              = "{{ dnat_protocol }}"
+  internal_service_port = {{ dnat_internal_port }}
+  external_service_port = {{ dnat_external_port }}
+}

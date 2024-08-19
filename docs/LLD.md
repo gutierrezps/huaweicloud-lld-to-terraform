@@ -1,16 +1,25 @@
 # Low-Level Design (LLD)
 
-This document contains the description of each tab in the LLD.xlsx spreadsheet
+This document contains the description of each tab in the `LLD.xlsx` spreadsheet
 and the associated arguments reference.
 
-## Table of Contents
-
-1. [General orientations](#general-orientations)
-2. [Enterprise Project](#enterprise-project)
-3. [Virtual Private Cloud (VPC)](#virtual-private-cloud-vpc)
-4. [Subnet](#subnet)
-5. [Security Group](#security-group-secgroup)
-6. [Elastic Cloud Server (ECS)](#elastic-cloud-server-ecs)
+- [Low-Level Design (LLD)](#low-level-design-lld)
+  - [General orientations](#general-orientations)
+  - [Enterprise Project](#enterprise-project)
+    - [EPS Argument Reference](#eps-argument-reference)
+  - [Virtual Private Cloud (VPC)](#virtual-private-cloud-vpc)
+    - [VPC Argument Reference](#vpc-argument-reference)
+  - [Subnet](#subnet)
+    - [Subnet Argument Reference](#subnet-argument-reference)
+  - [Security Group (secgroup)](#security-group-secgroup)
+    - [Secgroup Argument Reference](#secgroup-argument-reference)
+  - [Elastic IP (EIP)](#elastic-ip-eip)
+    - [EIP Argument Reference](#eip-argument-reference)
+  - [NAT Gateway](#nat-gateway)
+    - [Public NAT Gateway instance Argument Reference](#public-nat-gateway-instance-argument-reference)
+    - [NAT Rules Argument Reference](#nat-rules-argument-reference)
+  - [Elastic Cloud Server (ECS)](#elastic-cloud-server-ecs)
+    - [ECS Argument Reference](#ecs-argument-reference)
 
 ## General orientations
 
@@ -171,6 +180,105 @@ security group rules.
   where the security group will be created. If this argument is set, the
   enterprise project must be specified in the associated spreadsheet tab.
 
+## Elastic IP (EIP)
+
+An [Elastic IP (EIP)][eip] is a public IP address that can be accessed directly
+over the Internet. An EIP consists of a public IP address and some amount of
+public network egress bandwidth. EIPs can be bound to or unbound from ECSs,
+BMSs, virtual IP addresses, NAT gateways, and load balancers.
+
+Each row of the spreadsheet corresponds to one EIP address.
+
+### EIP Argument Reference
+
+- **SN** - (optional, not used) Serial number, only for reference.
+- **Region** - (required, force new) Region code (e.g. `sa-brazil-1`) in which
+  to create the EIP. See [Regions and Endpoints][endpoints] to get the desired
+  region code.
+- **EIP Name** - (required, resource name) Name of the EIP, which is also used
+  to compose the bandwidth name. The value is a string of no more than 64
+  characters and can contain digits, letters, underscores (_), and hyphens (-).
+- **Charge Mode** - (required) Specifies whether the bandwidth is billed by
+  traffic or by bandwidth size. The value can be `traffic` or `bandwidth`.
+- **Size Mbit** - (required) Bandwidth size in Mbit/s. Valid value is integer
+  from 1 to 300.
+- **Enterprise Project** - (optional, force new) Name of enterprise project
+  where the Elastic IP will be created. If this argument is set, the
+  enterprise project must be specified in the associated spreadsheet tab.
+
+## NAT Gateway
+
+[NAT Gateway][nat] is a network address translation (NAT) service. A public NAT
+gateway enables cloud and on-premises servers in a private subnet to share an
+EIP to access the Internet (through a SNAT Rule) or provide services accessible
+from the Internet (through a DNAT Rule).
+
+Each row of the spreadsheet `NAT` corresponds to one public NAT Gateway instance.
+
+Each row of the spreadsheet `NATrules` corresponds to one SNAT/DNAT rule in the
+specified NAT Gateway.
+
+### Public NAT Gateway instance Argument Reference
+
+- **SN** - (optional, not used) Serial number, only for reference.
+- **Region** - (required, force new) Region code (e.g. `sa-brazil-1`) in which
+  to create the public NAT Gateway. See [Regions and Endpoints][endpoints] to
+  get the desired region code. Changing this creates a new NAT Gateway.
+- **NAT Name** - (required, resource name) Name of the NAT Gateway, which is
+  also used to compose NAT rules names. The value is a string of no more than 64
+  characters and can contain digits, letters, underscores (_), and hyphens (-).
+- **VPC Name** - (required, force new) Name of the VPC specified in the
+  associated spreadsheet tab. Changing this creates a new NAT Gateway.
+- **Subnet Name** - (required, force new) Name of the subnet specified in the
+  associated spreadsheet tab. Changing this creates a new NAT Gateway.
+- **Scale** - (required) Specification of the NAT gateway. Valid values is
+  integer from `1` to `4`, where `1` corresponds to Small type, and `4`
+  correspons to Extra-large type.
+- **Private IP** - (optional, force new) Private IP address of NAT gateway,
+  which must be within the subnet range. Changing this creates a new NAT Gateway.
+- **Description** - (optional) Supplementary information about the NAT Gateway.
+  This parameter can contain a maximum of 255 characters and cannot contain
+  angle brackets (< or >).
+- **Enterprise Project** - (optional, force new) Name of enterprise project
+  where the NAT gateway will be created. If this argument is set, the
+  enterprise project must be specified in the associated spreadsheet tab.
+
+### NAT Rules Argument Reference
+
+- **SN** - (optional, not used) Serial number, only for reference.
+- **NAT Name** - (required, resource name) Name of the NAT Gateway specified in
+  the associated spreadsheet tab.
+- **Rule Type** - (required, force new) Direction of the rule, valid
+  values are **DNAT** (inbound/ingress) and **SNAT** (outbound/egress).
+- **EIP Name** - (required, force new) Name of the EIP specified in the
+  associated spreadsheet tab. Changing this creates a new NAT rule.
+- **Description** - (optional) Supplementary information about the NAT rule.
+  This parameter can contain a maximum of 255 characters and cannot contain
+  angle brackets (< or >).
+
+For DNAT rules, the following arguments are supported:
+
+> Before creating a DNAT rule, make sure the resource is already created in the
+> target subnet, otherwise the following error message will be displayed when
+> applying changes: `Error: no networking port found`. If this happens,
+> run the Terraform command again.
+
+- **DNAT External Port** - (required) Specifies port used in EIP to provide
+  services for external systems.
+- **DNAT Subnet Name** - (required) Name of the subnet specified in the
+  associated spreadsheet tab. Subnet where the resource is located.
+- **DNAT Internal IP** - (required) Private IP address of the resource, already
+  existing in the subnet.
+- **DNAT Internal Port** - (required) Specifies port used by resource (e.g. ECS)
+  to provide services for external systems.
+
+For SNAT rules, the following arguments are supported:
+
+- **SNAT CIDR/subnet** - (required, force new) Specify the CIDR block (e.g.
+  `10.0.0.0/8`) or the subnet name (specified in the associated spreadsheet tab)
+  which will be connected by SNAT rule. Changing this will create a new SNAT
+  rule.
+
 ## Elastic Cloud Server (ECS)
 
 An [Elastic Cloud Server (ECS)][ecs] is a basic computing unit that consists of
@@ -233,7 +341,7 @@ Each row of the spreadsheet corresponds to one ECS.
 Each ECS can have up to 8 Network Interface Cards (NICs). Replace `#` in the
 argument name by the NIC index, between 1 and 8. NIC1 information is required,
 while NIC2 onward is optional. Only NIC1 and NIC2 columns are present in the
-default LLD.xlsx file, more columns can be added for other NICs, always
+default `LLD.xlsx` file, more columns can be added for other NICs, always
 following the same pattern. Each ECS flavor has a different number of maximum
 NICs that are supported, [check the documentation][ecs-flavors].
 
@@ -263,7 +371,7 @@ System disk specifications:
 
 Each ECS can have up to 23 EVS data disks. Replace `#` in the argument name by
 the EVS index, between 1 and 23. Only data disk 1 and 2 columns are present in
-the default LLD.xlsx file, more columns can be added for other data disks,
+the default `LLD.xlsx` file, more columns can be added for other data disks,
 always following the same pattern. Data disks are optional.
 
 - **Data Disk # Type** - (required, force new) Disk type code. Valid values
@@ -289,3 +397,5 @@ always following the same pattern. Data disks are optional.
 [kps]: <https://support.huaweicloud.com/intl/en-us/usermanual-dew/dew_01_0034.html>
 [ecs-flavors]: <https://support.huaweicloud.com/intl/en-us/productdesc-ecs/ecs_01_0014.html>
 [vip]: <https://support.huaweicloud.com/intl/en-us/productdesc-vpc/vpc_Concepts_0012.html>
+[eip]: <https://support.huaweicloud.com/intl/en-us/productdesc-eip/overview_0001.html>
+[nat]: <https://support.huaweicloud.com/intl/en-us/productdesc-natgateway/en-us_topic_0086739762.html>

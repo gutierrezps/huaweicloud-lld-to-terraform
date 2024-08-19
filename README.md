@@ -48,6 +48,7 @@ For now, only the following resources are converted from LLD:
 
 - VPCs and Subnets
 - Security groups
+- Elastic IPs (EIPs)
 - ECSs
   - Security group (assignment)
   - Multiple NICs
