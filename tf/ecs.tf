@@ -161,8 +161,8 @@ resource "huaweicloud_networking_vip_associate" "vip_10_4_1_12_associate" {
   region    = huaweicloud_networking_vip.vip_10_4_1_12.region
   vip_id    = huaweicloud_networking_vip.vip_10_4_1_12.id
   port_ids  = [
-    split("/", huaweicloud_compute_interface_attach.nic_ecs_prod_01a_net_net01.id)[1],
-    split("/", huaweicloud_compute_interface_attach.nic_ecs_prod_01b_net_net01.id)[1]
+    huaweicloud_compute_interface_attach.nic_ecs_prod_01a_net_net01.port_id,
+    huaweicloud_compute_interface_attach.nic_ecs_prod_01b_net_net01.port_id
   ]
 }
 

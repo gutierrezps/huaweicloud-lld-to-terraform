@@ -161,13 +161,11 @@ class Nics2Terraform:
             for host in vip_data['hosts']:
                 host = clean_str(host)
                 if vip_data.get('extension', False):
-                    # if VIP is for an extension NIC, use Terraform's split()
-                    # to get the port ID from the interface_attach ID,
-                    # which has the format "{ECS ID}/{Port ID}"
-                    port_str = 'split("/", '
-                    port_str += 'huaweicloud_compute_interface_attach'
+                    # if VIP is for an extension NIC, use port ID from
+                    # compute_interface_attach resource"
+                    port_str = 'huaweicloud_compute_interface_attach'
                     port_str += f'.nic_{ host }_{ vip_data["subnet"] }'
-                    port_str += '.id)[1]'
+                    port_str += '.port_id'
                 else:
                     # if VIP is for the primary NIC, get the port ID from
                     # ECS' network block
