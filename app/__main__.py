@@ -53,10 +53,10 @@ def process_vpc(worksheet: Worksheet):
 
     vpc_handler = Vpc2Terraform()
 
-    process_sheet_data(worksheet.title, data, vpc_handler.add_vpc)
+    process_sheet_data(worksheet.title, data, vpc_handler.add)
 
     with open('tf/vpc_subnet.tf', 'w') as output_file:
-        vpc_handler.output_terraform_code(output_file)
+        vpc_handler.to_terraform(output_file)
 
 
 def process_subnet(worksheet: Worksheet):
@@ -64,10 +64,10 @@ def process_subnet(worksheet: Worksheet):
 
     subnet_handler = Subnet2Terraform()
 
-    process_sheet_data(worksheet.title, data, subnet_handler.add_subnet)
+    process_sheet_data(worksheet.title, data, subnet_handler.add)
 
     with open('tf/vpc_subnet.tf', 'a') as output_file:
-        subnet_handler.output_terraform_code(output_file)
+        subnet_handler.to_terraform(output_file)
 
 
 def process_secgroup(worksheet: Worksheet):
@@ -76,10 +76,10 @@ def process_secgroup(worksheet: Worksheet):
     secgroup_handler = Secgroup2Terraform()
 
     process_sheet_data(
-        worksheet.title, data, secgroup_handler.add_secgroup_rule)
+        worksheet.title, data, secgroup_handler.add)
 
     with open('tf/secgroups.tf', 'w') as output_file:
-        secgroup_handler.output_terraform_code(output_file)
+        secgroup_handler.to_terraform(output_file)
 
 
 def process_eip(worksheet: Worksheet):
@@ -87,10 +87,10 @@ def process_eip(worksheet: Worksheet):
 
     eip_handler = Eip2Terraform()
 
-    process_sheet_data(worksheet.title, data, eip_handler.add_eip)
+    process_sheet_data(worksheet.title, data, eip_handler.add)
 
     with open('tf/eips.tf', 'w') as output_file:
-        eip_handler.output_terraform_code(output_file)
+        eip_handler.to_terraform(output_file)
 
 
 def process_nat(worksheet: Worksheet):
@@ -98,10 +98,10 @@ def process_nat(worksheet: Worksheet):
 
     nat_handler = Nat2Terraform()
 
-    process_sheet_data(worksheet.title, data, nat_handler.append)
+    process_sheet_data(worksheet.title, data, nat_handler.add)
 
     with open('tf/nat.tf', 'w') as output_file:
-        nat_handler.output_terraform_code(output_file)
+        nat_handler.to_terraform(output_file)
 
     return nat_handler.to_dict()
 
@@ -111,10 +111,10 @@ def process_nat_rules(worksheet: Worksheet, nat_data: dict):
 
     rule_handler = NatRule2Terraform(nat_data)
 
-    process_sheet_data(worksheet.title, data, rule_handler.append)
+    process_sheet_data(worksheet.title, data, rule_handler.add)
 
     with open('tf/nat.tf', 'a') as output_file:
-        rule_handler.output_terraform_code(output_file)
+        rule_handler.to_terraform(output_file)
 
 
 def process_enterpriseproj(worksheet: Worksheet):
@@ -123,10 +123,10 @@ def process_enterpriseproj(worksheet: Worksheet):
     project_handler = EnterpriseProj2Terraform()
 
     process_sheet_data(
-        worksheet.title, data, project_handler.add_project)
+        worksheet.title, data, project_handler.add)
 
     with open('tf/enterpriseproj.tf', 'w') as output_file:
-        project_handler.output_terraform_code(output_file)
+        project_handler.to_terraform(output_file)
 
 
 def main():
