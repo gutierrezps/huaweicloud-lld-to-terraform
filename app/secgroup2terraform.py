@@ -1,35 +1,39 @@
 from io import TextIOWrapper
+
 from pystache import Renderer
 
-from .utils import clean_str
+from .resource2terraform import Resource2Terraform
 
 
-class Secgroup2Terraform:
+class Secgroup2Terraform(Resource2Terraform):
     def __init__(self) -> None:
-        self._secgroup = {}
+        super().__init__(template_name='secgroup', key_attr='secgroup')
+        self._attr_clean = {
+            'secgroup': 'security_group_name',
+            'project': 'enterprise_project'
+        }
 
-    def add_secgroup_rule(self, rule_data: dict):
-        secgroup = clean_str(rule_data['security_group_name'])
+    def add(self, rule_data: dict):
+        rule_data = self._clean(rule_data)
+        secgroup = rule_data['secgroup']
 
-        if secgroup not in self._secgroup:
-            self._secgroup[secgroup] = {
+        if secgroup not in self._resources_data:
+            self._resources_data[secgroup] = {
                 'secgroup': secgroup,
                 'secgroup_name': rule_data['security_group_name'],
                 'region': rule_data['region'],
-                'rules': []
+                'rules': [],
+                'project': rule_data['project']
             }
-            if 'enterprise_project' in rule_data:
-                project = clean_str(rule_data['enterprise_project'])
-                self._secgroup[secgroup]['project'] = project
 
         if rule_data['protocol'] == 'all':
             del rule_data['protocol']
         if rule_data['ports'] == 'all':
             del rule_data['ports']
 
-        self._secgroup[secgroup]['rules'].append(rule_data)
+        self._resources_data[secgroup]['rules'].append(rule_data)
 
-    def output_terraform_code(self, output_file: TextIOWrapper):
+    def to_terraform(self, output_file: TextIOWrapper):
         """Transforms all Secgroup data into Terraform code, and save to
         output_file.
 
@@ -38,7 +42,7 @@ class Secgroup2Terraform:
         """
         renderer = Renderer()
 
-        for secgroup, secgroup_data in self._secgroup.items():
+        for secgroup, secgroup_data in self._resources_data.items():
             tf_code = renderer.render_name('templates/secgroup', secgroup_data)
             tf_code += '\n'
             output_file.write(tf_code)

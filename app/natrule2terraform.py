@@ -1,31 +1,32 @@
 import re
-from io import TextIOWrapper
 
-from pystache import Renderer
-
+from .resource2terraform import Resource2Terraform
 from .utils import clean_str
 
 
-class NatRule2Terraform:
+class NatRule2Terraform(Resource2Terraform):
     def __init__(self, nat_data: dict) -> None:
-        self._nat_rule = []
-        self._nat_data = nat_data
+        super().__init__(template_name='nat-rule', key_attr='_id')
 
-    def append(self, rule_data: dict):
-        rule_data['rule_type'] = rule_data['rule_type'].lower()
+        self._attr_clean = {
+            'nat': 'nat_name',
+            'subnet': 'dnat_subnet_name',
+            'eip': 'eip_name',
+            'rule_type': 'rule_type'
+        }
+
+        self._nat_data = nat_data
+        self._next_id = 1
+
+    def _parse(self, rule_data: dict):
         rule_type = rule_data['rule_type']
 
-        if rule_type not in ['dnat', 'snat']:
-            return 'Rule Type must be DNAT or SNAT'
+        rule_data['template_variation'] = rule_type
 
-        nat = clean_str(rule_data['nat_name'])
-        rule_data['nat'] = nat
-
-        subnet = self._nat_data[nat]['vpc'] + '_'
+        subnet = self._nat_data[rule_data['nat']]['vpc'] + '_'
 
         if rule_type == 'dnat':
             subnet += clean_str(rule_data['dnat_subnet_name'])
-            rule_data['subnet'] = subnet
         else:
             dest = rule_data['snat_cidr_subnet'].strip()
 
@@ -33,25 +34,21 @@ class NatRule2Terraform:
                 rule_data['cidr'] = dest
             else:
                 subnet += clean_str(dest)
-                rule_data['subnet'] = subnet
 
-        eip = clean_str(rule_data['eip_name'])
-        rule_data['eip'] = eip
+        rule_data['subnet'] = subnet
 
-        self._nat_rule.append(rule_data)
+        rule_data['_id'] = self._next_id
+        rule_data['rule'] = f'{rule_type}_rule{self._next_id:02}'
 
-    def output_terraform_code(self, output_file: TextIOWrapper):
-        """Transforms all NAT rules data into Terraform code, and save to
-        output_file.
+        self._next_id += 1
 
-        Args:
-            output_file (TextIOWrapper): file to write the tf code
-        """
-        renderer = Renderer()
+        return super()._parse(rule_data)
 
-        for i, nat_data in enumerate(self._nat_rule):
-            filename = f'nat-rule-{nat_data["rule_type"]}'
-            nat_data['rule'] = f'{nat_data["rule_type"]}_rule{i+1:02}'
-            tf_code = renderer.render_name(f'templates/{filename}', nat_data)
-            tf_code += '\n'
-            output_file.write(tf_code)
+    def _validate(self, rule_data: dict):
+        error_msg = None
+
+        rule_type = rule_data['rule_type']
+        if rule_type not in ['dnat', 'snat']:
+            error_msg = f'Rule Type must be DNAT or SNAT ({rule_type})'
+
+        return super()._validate(rule_data, error_msg)
