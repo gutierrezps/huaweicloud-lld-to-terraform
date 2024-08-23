@@ -86,7 +86,7 @@ class Ecs2Terraform:
         functions = [
             self._validate_ecs,
             self._nics_handler.add_nics,
-            self._evs_handler.add_disks,
+            self._evs_handler.add,
             self._add_servergroup,
         ]
 
@@ -156,4 +156,4 @@ class Ecs2Terraform:
 
         output_file.write(self._nics_handler.terraform_code())
 
-        output_file.write(self._evs_handler.terraform_code())
+        output_file.write(self._evs_handler.to_terraform())

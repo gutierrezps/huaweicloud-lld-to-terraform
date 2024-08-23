@@ -1,18 +1,65 @@
 from pystache import Renderer
 
+from .resource2terraform import Resource2Terraform
 
-class Evs2Terraform:
+
+class Evs2Terraform(Resource2Terraform):
     # each ECS has at most 23 data disks
     DATA_DISK_IDS = range(1, 24)
     DISK_PARAMS = ['type', 'size', 'shared']
 
-    def __init__(self):
-        self.current_ecs_disks = {}
-        self.data_disks = {}
-        self.ecs_attachments = {}
+    def __init__(self) -> None:
+        super().__init__(template_name='evs', key_attr='evs_name')
+        self._data_disks = {}
+        self._ecs_attachments = {}
 
-    def _extract_data_disk_params(self, ecs_data: dict, i_disk: int):
-        self.current_ecs_disks[i_disk] = {}
+    def add(self, ecs_data: dict):
+        ecs_disks = {}
+
+        for i_disk in self.DATA_DISK_IDS:
+            evs_data = self._parse(ecs_data, i_disk)
+            if evs_data is None:
+                break
+
+            error_msg = self._validate(evs_data)
+            if error_msg is not None:
+                return error_msg
+
+            ecs_disks[i_disk] = evs_data
+
+        if not ecs_disks:
+            return None
+
+        self._ecs_attachments[ecs_data['ecs_name']] = []
+
+        for i_disk, evs_data in ecs_disks.items():
+            evs = self._consolidate_evs_data(ecs_data, evs_data, i_disk)
+            if evs['evs_name'] not in self._data_disks:
+                self._data_disks[evs['evs_name']] = evs
+            self._ecs_attachments[ecs_data['ecs_name']].append(evs)
+
+    def _validate(self, disk_data: dict):
+        error_msg = None
+        i_disk = disk_data['i_disk']
+
+        disk_size = disk_data.get('size', 0)
+        if disk_size < 10:
+            msg = f'data disk {i_disk} size < 10GB ({disk_size})'
+            raise ValueError(msg)
+
+        # type, size and shared should be specified for each data disk,
+        # check if there is any of those values missing
+        missing_params = set(self.DISK_PARAMS)
+        missing_params -= set(disk_data.keys())
+        if missing_params:
+            msg = f'data disk {i_disk} has missing params: '
+            msg += f'{list(missing_params)[0]}'
+            raise ValueError(msg)
+
+        return error_msg
+
+    def _parse(self, ecs_data: dict, i_disk: int):
+        evs_data = {}
 
         # extract values for each param
         for param in self.DISK_PARAMS:
@@ -22,34 +69,13 @@ class Evs2Terraform:
                     # convert 'shared' disk value to boolean
                     is_shared = ecs_data[full_param].lower() == 'yes'
                     ecs_data[full_param] = is_shared
-                self.current_ecs_disks[i_disk][param] = ecs_data[full_param]
+                evs_data[param] = ecs_data[full_param]
 
-        # check if no data disk param was filled
-        if not self.current_ecs_disks[i_disk]:
-            self.current_ecs_disks.pop(i_disk)
-            return
+        if not evs_data:
+            return None
 
-        disk_size = self.current_ecs_disks[i_disk].get('size', 0)
-        if not disk_size:
-            msg = f"[WRN] ignoring disk {i_disk} of {ecs_data['hostname']}"
-            msg += ' - empty size'
-            print(msg)
-            self.current_ecs_disks.pop(i_disk)
-            return
-
-        if disk_size < 10:
-            msg = f'ecs {ecs_data["hostname"]} data disk {i_disk} '
-            msg += f'size < 10GB ({disk_size})'
-            raise ValueError(msg)
-
-        # type, size and shared should be specified for each data disk,
-        # check if there is any of those values missing
-        missing_params = set(self.DISK_PARAMS)
-        missing_params -= set(self.current_ecs_disks[i_disk].keys())
-        if missing_params:
-            msg = f'ecs {ecs_data["hostname"]} data disk {i_disk} '
-            msg += f'has missing params: {list(missing_params)[0]}'
-            raise ValueError(msg)
+        evs_data['i_disk'] = i_disk
+        return evs_data
 
     def _consolidate_evs_data(
             self, ecs_data: dict, evs_data: dict, i_disk: int
@@ -90,27 +116,27 @@ class Evs2Terraform:
         return evs_data
 
     def add_disks(self, ecs_data: dict):
-        self.current_ecs_disks = {}
+        self._current_ecs_disks = {}
 
         for i_disk in self.DATA_DISK_IDS:
-            self._extract_data_disk_params(ecs_data, i_disk)
+            self._parse_single(ecs_data, i_disk)
 
-        if not self.current_ecs_disks:
+        if not self._current_ecs_disks:
             return
 
-        self.ecs_attachments[ecs_data['ecs_name']] = []
+        self._ecs_attachments[ecs_data['ecs_name']] = []
 
-        for i_disk, evs_data in self.current_ecs_disks.items():
+        for i_disk, evs_data in self._current_ecs_disks.items():
             evs = self._consolidate_evs_data(ecs_data, evs_data, i_disk)
-            if evs['evs_name'] not in self.data_disks:
-                self.data_disks[evs['evs_name']] = evs
-            self.ecs_attachments[ecs_data['ecs_name']].append(evs)
+            if evs['evs_name'] not in self._data_disks:
+                self._data_disks[evs['evs_name']] = evs
+            self._ecs_attachments[ecs_data['ecs_name']].append(evs)
 
     def _disks_to_tfcode(self) -> str:
         renderer = Renderer()
         tf_code = ''
 
-        for evs_data in self.data_disks.values():
+        for evs_data in self._data_disks.values():
             tf_code += renderer.render_name('templates/evs', evs_data)
             tf_code += '\n'
 
@@ -120,7 +146,7 @@ class Evs2Terraform:
         renderer = Renderer()
         tf_code = ''
 
-        for ecs_name, disk_list in self.ecs_attachments.items():
+        for ecs_name, disk_list in self._ecs_attachments.items():
             next_depends_on = None
             for evs_data in disk_list:
                 if next_depends_on is not None:
@@ -143,7 +169,7 @@ class Evs2Terraform:
 
         return tf_code
 
-    def terraform_code(self) -> str:
+    def to_terraform(self) -> str:
         tf_code = self._disks_to_tfcode()
         tf_code += self._attachments_to_tfcode()
         return tf_code
