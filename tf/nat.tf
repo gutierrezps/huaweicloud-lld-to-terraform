@@ -9,6 +9,7 @@ resource "huaweicloud_nat_gateway" "nat_gw" {
 }
 
 data "huaweicloud_networking_port" "nat_gw_dnat_rule01_port" {
+  region     = huaweicloud_nat_gateway.nat_gw.region
   network_id = huaweicloud_vpc_subnet.dev_dev01.id
   fixed_ip   = "10.1.1.20"
 }
@@ -31,4 +32,3 @@ resource "huaweicloud_nat_snat_rule" "nat_gw_snat_rule02" {
   description     = ""
   subnet_id       = huaweicloud_vpc_subnet.dev_dev01.id
 }
-
