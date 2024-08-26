@@ -1,4 +1,5 @@
 data "huaweicloud_networking_port" "{{ rule }}_port" {
+  region     = huaweicloud_nat_gateway.{{ nat }}.region
   network_id = huaweicloud_vpc_subnet.{{ subnet }}.id
   fixed_ip   = "{{ dnat_internal_ip }}"
 }

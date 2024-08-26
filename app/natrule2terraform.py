@@ -38,7 +38,8 @@ class NatRule2Terraform(Resource2Terraform):
         rule_data['subnet'] = subnet
 
         rule_data['_id'] = self._next_id
-        rule_data['rule'] = f'{rule_type}_rule{self._next_id:02}'
+        rule_data['rule'] = f'{rule_data["nat"]}_{rule_type}_'
+        rule_data['rule'] += f'rule{self._next_id:02}'
 
         self._next_id += 1
 
