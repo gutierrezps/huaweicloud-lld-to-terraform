@@ -156,4 +156,4 @@ class Ecs2Terraform:
 
         output_file.write(self._nics_handler.terraform_code())
 
-        output_file.write(self._evs_handler.to_terraform())
+        self._evs_handler.to_terraform(output_file)

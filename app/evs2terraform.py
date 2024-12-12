@@ -1,3 +1,4 @@
+from io import TextIOWrapper
 from pystache import Renderer
 
 from .resource2terraform import Resource2Terraform
@@ -10,8 +11,7 @@ class Evs2Terraform(Resource2Terraform):
 
     def __init__(self) -> None:
         super().__init__(template_name='evs', key_attr='evs_name')
-        self._data_disks = {}
-        self._ecs_attachments = {}
+        self._ecs_attachments: dict[str, list] = {}
 
     def add(self, ecs_data: dict):
         ecs_disks = {}
@@ -34,8 +34,8 @@ class Evs2Terraform(Resource2Terraform):
 
         for i_disk, evs_data in ecs_disks.items():
             evs = self._consolidate_evs_data(ecs_data, evs_data, i_disk)
-            if evs['evs_name'] not in self._data_disks:
-                self._data_disks[evs['evs_name']] = evs
+            if evs['evs_name'] not in self._resources_data:
+                self._resources_data[evs['evs_name']] = evs
             self._ecs_attachments[ecs_data['ecs_name']].append(evs)
 
     def _validate(self, disk_data: dict):
@@ -115,33 +115,6 @@ class Evs2Terraform(Resource2Terraform):
 
         return evs_data
 
-    def add_disks(self, ecs_data: dict):
-        self._current_ecs_disks = {}
-
-        for i_disk in self.DATA_DISK_IDS:
-            self._parse_single(ecs_data, i_disk)
-
-        if not self._current_ecs_disks:
-            return
-
-        self._ecs_attachments[ecs_data['ecs_name']] = []
-
-        for i_disk, evs_data in self._current_ecs_disks.items():
-            evs = self._consolidate_evs_data(ecs_data, evs_data, i_disk)
-            if evs['evs_name'] not in self._data_disks:
-                self._data_disks[evs['evs_name']] = evs
-            self._ecs_attachments[ecs_data['ecs_name']].append(evs)
-
-    def _disks_to_tfcode(self) -> str:
-        renderer = Renderer()
-        tf_code = ''
-
-        for evs_data in self._data_disks.values():
-            tf_code += renderer.render_name('templates/evs', evs_data)
-            tf_code += '\n'
-
-        return tf_code
-
     def _attachments_to_tfcode(self) -> str:
         renderer = Renderer()
         tf_code = ''
@@ -169,7 +142,7 @@ class Evs2Terraform(Resource2Terraform):
 
         return tf_code
 
-    def to_terraform(self) -> str:
-        tf_code = self._disks_to_tfcode()
-        tf_code += self._attachments_to_tfcode()
-        return tf_code
+    def to_terraform(self, output_file: TextIOWrapper):
+        super().to_terraform(output_file)
+        tf_code = self._attachments_to_tfcode()
+        output_file.write(tf_code)
