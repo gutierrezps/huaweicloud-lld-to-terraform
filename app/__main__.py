@@ -42,7 +42,7 @@ def process_ecs(worksheet: Worksheet, last_wave: int):
 
     ecs_handler = Ecs2Terraform(last_wave)
 
-    process_sheet_data(worksheet.title, data, ecs_handler.add_ecs)
+    process_sheet_data(worksheet.title, data, ecs_handler.add)
 
     with open('tf/ecs.tf', 'w') as output_file:
         ecs_handler.output_terraform_code(output_file)

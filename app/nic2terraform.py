@@ -4,8 +4,10 @@ from pystache import Renderer
 
 from app.utils import clean_str
 
+from .resource2terraform import Resource2Terraform
 
-class Nics2Terraform:
+
+class Nic2Terraform(Resource2Terraform):
     # Each ECS can have up to 8 NICs
     NIC_IDS = range(1, 9)
 
@@ -13,7 +15,7 @@ class Nics2Terraform:
     NIC_PARAMS = ['vpc', 'subnet', 'fixed_ip', 'security_group']
 
     def __init__(self):
-        self.ecs_nics = {}
+        super().__init__(template_name='nic', key_attr='ecs_name')
 
         # Example virtual_ips data:
         # {
@@ -27,44 +29,13 @@ class Nics2Terraform:
         # }
         # If 'extension' is present and is True in VIP data, it means it is
         # attached to an extension NIC (not the primary NIC).
-        self.virtual_ips = {}
+        self._virtual_ips = {}
 
         # key is the original IP, value is the VIP
-        self.ips_with_vips = {}
-
-    def transform_params(self, ecs_data: dict) -> dict:
-        """Apply transformations to the ecs parameters.
-
-        Clean vpc, subnet and security group, to be used as resource IDs
-        in Terraform code. Also prepend vpc to subnet, because subnet
-        name can be repeated.
-
-        Args:
-            ecs_data (dict): input ecs data
-
-        Returns:
-            dict: output ecs data
-        """
-        clean_params = ['vpc', 'subnet', 'security_group']
-        for i_nic in self.NIC_IDS:
-            params = [f'nic{ i_nic }_{p}' for p in clean_params]
-            for p in params:
-                if p not in ecs_data:
-                    continue
-                ecs_data[p] = clean_str(ecs_data[p])
-
-            try:
-                subnet_name = ecs_data[f'nic{ i_nic }_vpc']
-                subnet_name += '_' + ecs_data[f'nic{ i_nic }_subnet']
-                ecs_data[f'nic{ i_nic }_subnet'] = subnet_name
-            except KeyError:
-                # nic is not defined
-                pass
-
-        return ecs_data
+        self._ips_with_virtual_ip = {}
 
     def add_nics(self, ecs_data: dict):
-        self.ecs_nics[ecs_data['ecs_name']] = []
+        self._resources_data[ecs_data['ecs_name']] = []
         for i_nic in self.NIC_IDS:
             self._add_nic(ecs_data, i_nic)
             self._add_virtual_ip(ecs_data, i_nic)
@@ -99,7 +70,7 @@ class Nics2Terraform:
         for nic_param, ecs_param in zip(self.NIC_PARAMS, params):
             nic_data[nic_param] = ecs_data[ecs_param]
 
-        self.ecs_nics[ecs_data['ecs_name']].append(nic_data)
+        self._resources_data[ecs_data['ecs_name']].append(nic_data)
 
     def _add_virtual_ip(self, ecs_data, i_nic):
         nic_vip_key = f'nic{ i_nic }_virtual_ip'
@@ -114,9 +85,9 @@ class Nics2Terraform:
             # remove IP comments, enclosed in parenthesis
             vip_addr = re.sub(r'\(.*\)', '', vip_addr).strip()
 
-            if vip_addr not in self.virtual_ips:
+            if vip_addr not in self._virtual_ips:
                 # first NIC with that VIP assigned
-                self.virtual_ips[vip_addr] = {
+                self._virtual_ips[vip_addr] = {
                     'name': clean_str(vip_addr),
                     'subnet': ecs_data[f'nic{ i_nic }_subnet'],
                     'ip': vip_addr,
@@ -125,14 +96,14 @@ class Nics2Terraform:
                     'extension': i_nic != 1
                 }
 
-            self.virtual_ips[vip_addr]['hosts'].append(ecs_data['ecs_name'])
-            self.ips_with_vips[ecs_data[nic_fixed_ip_key]] = vip_addr
+            self._virtual_ips[vip_addr]['hosts'].append(ecs_data['ecs_name'])
+            self._ips_with_virtual_ip[ecs_data[nic_fixed_ip_key]] = vip_addr
 
     def _nics_to_tfcode(self, ecs_name, renderer):
         tf_code = ''
         next_depends_on = None
 
-        for nic_data in self.ecs_nics[ecs_name]:
+        for nic_data in self._resources_data[ecs_name]:
             if next_depends_on is not None:
                 # one attachment depends on the previous one to be
                 # finished, in order to ensure NIC order
@@ -156,7 +127,7 @@ class Nics2Terraform:
     def _vips_to_tfcode(self, renderer) -> str:
         tf_code = ''
 
-        for vip_data in self.virtual_ips.values():
+        for vip_data in self._virtual_ips.values():
             ports = []
             for host in vip_data['hosts']:
                 host = clean_str(host)
@@ -183,17 +154,20 @@ class Nics2Terraform:
         return tf_code
 
     def has_vip(self, fixed_ip: str) -> bool:
-        return fixed_ip in self.ips_with_vips
+        return fixed_ip in self._ips_with_virtual_ip
 
     def get_secgroups(self, ecs_name: str) -> list:
-        secgroups = [nic['security_group'] for nic in self.ecs_nics[ecs_name]]
+        secgroups = [
+            nic['security_group']
+            for nic in self._resources_data[ecs_name]
+            ]
         return secgroups
 
     def terraform_code(self):
         renderer = Renderer()
         tf_code = ''
 
-        for ecs_name in self.ecs_nics.keys():
+        for ecs_name in self._resources_data.keys():
             tf_code += self._nics_to_tfcode(ecs_name, renderer)
 
         tf_code += self._vips_to_tfcode(renderer)

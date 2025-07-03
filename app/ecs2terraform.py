@@ -2,57 +2,59 @@ from io import TextIOWrapper
 from pystache import Renderer
 
 from .evs2terraform import Evs2Terraform
-from .nics2terraform import Nics2Terraform
-from .utils import clean_str
+from .nic2terraform import Nic2Terraform
+from .resource2terraform import Resource2Terraform
 
 
-class Ecs2Terraform:
+class Ecs2Terraform(Resource2Terraform):
     def __init__(self, last_wave: int):
-        self._ecs = {}
+        super().__init__(template_name='ecs', key_attr='ecs_name')
         self._servergroups = {}
-        self._nics_handler = Nics2Terraform()
+        self._nics_handler = Nic2Terraform()
         self._evs_handler = Evs2Terraform()
         self._last_wave = last_wave
 
-    def _transform_params(self, ecs_data: dict) -> dict:
-        """Apply transformations to the ecs parameters.
+        self._attr_clean = {
+            'ecs_name': 'hostname',
+            'project': 'enterprise_project'
+        }
 
-        Transformations include renaming, appending, clean_str etc.
+        nic_clean_params = ['vpc', 'subnet', 'security_group']
+        for i_nic in Nic2Terraform.NIC_IDS:
+            params = [f'nic{ i_nic }_{p}' for p in nic_clean_params]
+            for p in params:
+                self._attr_clean[p] = p
 
-        Args:
-            ecs_data (dict): input ecs data
+    def _parse(self, resource_data: dict):
+        for i_nic in Nic2Terraform.NIC_IDS:
+            try:
+                subnet_name = resource_data[f'nic{ i_nic }_vpc']
+                subnet_name += '_' + resource_data[f'nic{ i_nic }_subnet']
+                resource_data[f'nic{ i_nic }_subnet'] = subnet_name
+            except KeyError:
+                # nic is not defined
+                pass
 
-        Returns:
-            dict: output ecs data, with transformations applied
-        """
-        ecs_data['ecs_name'] = clean_str(ecs_data['hostname'])
-
-        ecs_data = self._nics_handler.transform_params(ecs_data)
-
-        tag_key = ecs_data.pop('tag_key', None)
+        tag_key = resource_data.pop('tag_key', None)
         if tag_key is not None:
-            ecs_data['tag'] = {
+            resource_data['tag'] = {
                 'key': tag_key,
-                'value': ecs_data['tag_value']
+                'value': resource_data['tag_value']
             }
 
-        project = ecs_data.pop('enterprise_project', None)
-        if project is not None:
-            ecs_data['project'] = clean_str(project)
-
-        group = ecs_data.get('ecs_group', None)
-        dedicated_host = ecs_data.pop('dedicated_host', None)
-        if group or dedicated_host:
+        group = resource_data.get('ecs_group', None)
+        dedicated_host = resource_data.pop('dedicated_host', None)
+        if group is not None or dedicated_host is not None:
             tenancy = 'dedicated' if dedicated_host == 'yes' else None
-            ecs_data['scheduler_hints'] = {
+            resource_data['scheduler_hints'] = {
                 'group': group,
                 'tenancy': tenancy
             }
 
-        return ecs_data
+        return resource_data
 
     def _validate_ecs(self, ecs_data: dict):
-        if ecs_data['ecs_name'] in self._ecs:
+        if ecs_data['ecs_name'] in self._resources_data:
             return 'duplicate hostname'
 
         if ecs_data['system_disk_size'] < 40:
@@ -72,14 +74,21 @@ class Ecs2Terraform:
                 'region': ecs_data['region']
             }
 
-    def add_ecs(self, ecs_data: dict):
-        ecs_data = self._transform_params(ecs_data)
-        ecs_name = ecs_data['ecs_name']
+    def add(self, resource_data: dict):
+        resource_data = self._clean(resource_data)
+
+        resource_data = self._parse(resource_data)
+
+        error_msg = self._validate(resource_data)
+        if error_msg is not None:
+            return error_msg
+
+        ecs_name = resource_data['ecs_name']
 
         # ECSs will be ignored if "Wave" value is not set, if it's
         # negative or if it's greather than "ECS last wave"
         # in metadata.xlsx
-        ecs_wave = ecs_data.pop('wave', 0)
+        ecs_wave = resource_data.pop('wave', 0)
         if ecs_wave <= 0 or ecs_wave > self._last_wave:
             return
 
@@ -91,18 +100,18 @@ class Ecs2Terraform:
         ]
 
         for fn in functions:
-            error = fn(ecs_data)
+            error = fn(resource_data)
             if error is not None:
-                return error + f' ({ecs_data["hostname"]})'
+                return error + f' ({resource_data["hostname"]})'
 
-        nic1_has_vip = self._nics_handler.has_vip(ecs_data['nic1_fixed_ip'])
-        ecs_data['source_dest_check'] = str(not nic1_has_vip).lower()
+        nic1_has_vip = self._nics_handler.has_vip(resource_data['nic1_fixed_ip'])
+        resource_data['source_dest_check'] = str(not nic1_has_vip).lower()
 
-        secgroups = [ecs_data['nic1_security_group']]
+        secgroups = [resource_data['nic1_security_group']]
         secgroups.extend(self._nics_handler.get_secgroups(ecs_name))
-        ecs_data['security_groups'] = secgroups
+        resource_data['security_groups'] = secgroups
 
-        self._ecs[ecs_name] = ecs_data
+        self._resources_data[ecs_name] = resource_data
 
         return None
 
@@ -142,7 +151,7 @@ class Ecs2Terraform:
         """
         renderer = Renderer()
 
-        for ecs_data in self._ecs.values():
+        for ecs_data in self._resources_data.values():
             secgroups = [
                 f'huaweicloud_networking_secgroup.{secgroup}.id'
                 for secgroup in ecs_data['security_groups']
