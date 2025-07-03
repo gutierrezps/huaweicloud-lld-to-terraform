@@ -20,7 +20,7 @@ METADATA_FILENAME = 'metadata.xlsx'
 
 def process_sheet_data(
         sheet_title: str,
-        sheet_data: list,
+        sheet_data: dict,
         handler_method: Callable
         ):
     for row_number, row_data in sheet_data.items():
@@ -134,6 +134,7 @@ def main():
     workbook = load_workbook(LLD_FILENAME, data_only=True)
 
     # load and validate "ECS last wave"
+    last_wave = 0
     try:
         last_wave = int(metadata['ecs_last_wave'])
         assert last_wave > 0

@@ -13,25 +13,25 @@ class Secgroup2Terraform(Resource2Terraform):
             'project': 'enterprise_project'
         }
 
-    def add(self, rule_data: dict):
-        rule_data = self._clean(rule_data)
-        secgroup = rule_data['secgroup']
+    def add(self, resource_data: dict):
+        resource_data = self._clean(resource_data)
+        secgroup = resource_data['secgroup']
 
         if secgroup not in self._resources_data:
             self._resources_data[secgroup] = {
                 'secgroup': secgroup,
-                'secgroup_name': rule_data['security_group_name'],
-                'region': rule_data['region'],
+                'secgroup_name': resource_data['security_group_name'],
+                'region': resource_data['region'],
                 'rules': [],
-                'project': rule_data['project']
+                'project': resource_data['project']
             }
 
-        if rule_data['protocol'] == 'all':
-            del rule_data['protocol']
-        if rule_data['ports'] == 'all':
-            del rule_data['ports']
+        if resource_data['protocol'] == 'all':
+            del resource_data['protocol']
+        if resource_data['ports'] == 'all':
+            del resource_data['ports']
 
-        self._resources_data[secgroup]['rules'].append(rule_data)
+        self._resources_data[secgroup]['rules'].append(resource_data)
 
     def to_terraform(self, output_file: TextIOWrapper):
         """Transforms all Secgroup data into Terraform code, and save to

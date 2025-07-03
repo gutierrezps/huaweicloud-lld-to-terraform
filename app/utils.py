@@ -65,7 +65,7 @@ def load_metadata(filename: str) -> dict:
         if row[0] is None:
             break
 
-        param_name = clean_str(row[0])
+        param_name = clean_str(str(row[0]))
         if param_name in params:
             print('[ERR] duplicate parameter:', param_name)
             exit(-1)
@@ -89,10 +89,10 @@ def load_sheet_columns(worksheet: Worksheet) -> dict:
     columns = {}
 
     for col in worksheet.iter_cols(min_col=1, min_row=1, max_row=1):
-        header: Cell = col[0]
+        header: Cell = col[0]  # type: ignore
         if header.value is None:
             break
-        param = clean_str(header.value.strip())
+        param = clean_str(str(header.value).strip())
         if param in columns:
             msg = f'[ERR] Duplicate header in sheet {worksheet.title}: '
             msg += f'{param}'
@@ -104,7 +104,7 @@ def load_sheet_columns(worksheet: Worksheet) -> dict:
     return columns
 
 
-def load_sheet_data(worksheet: Worksheet) -> list:
+def load_sheet_data(worksheet: Worksheet) -> dict:
     """Load worksheet data, using header row as parameter names.
 
     Returns a list of dicts, where each dict is a worksheet row, and in
@@ -120,7 +120,8 @@ def load_sheet_data(worksheet: Worksheet) -> list:
         worksheet (Worksheet): input worksheet
 
     Returns:
-        list: of dicts, with data of each row
+        dict: where key is the row index, and value is a dict with
+            param (column name) and its value (cell contents)
     """
     columns = load_sheet_columns(worksheet)
 

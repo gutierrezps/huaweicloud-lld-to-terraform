@@ -104,7 +104,8 @@ class Ecs2Terraform(Resource2Terraform):
             if error is not None:
                 return error + f' ({resource_data["hostname"]})'
 
-        nic1_has_vip = self._nics_handler.has_vip(resource_data['nic1_fixed_ip'])
+        nic1_has_vip = self._nics_handler.has_vip(
+            resource_data['nic1_fixed_ip'])
         resource_data['source_dest_check'] = str(not nic1_has_vip).lower()
 
         secgroups = [resource_data['nic1_security_group']]

@@ -58,7 +58,7 @@ class Resource2Terraform:
     def _parse(self, resource_data: dict):
         return resource_data
 
-    def _validate(self, resource_data: dict, error_msg: str = None):
+    def _validate(self, resource_data: dict, error_msg: str | None = None):
         if error_msg is not None:
             return error_msg
 

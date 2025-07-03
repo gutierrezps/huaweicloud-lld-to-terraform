@@ -18,38 +18,36 @@ class NatRule2Terraform(Resource2Terraform):
         self._nat_data = nat_data
         self._next_id = 1
 
-    def _parse(self, rule_data: dict):
-        rule_type = rule_data['rule_type']
+    def _parse(self, resource_data: dict):
+        rule_type = resource_data['rule_type']
 
-        rule_data['template_variation'] = rule_type
+        resource_data['template_variation'] = rule_type
 
-        subnet = self._nat_data[rule_data['nat']]['vpc'] + '_'
+        subnet = self._nat_data[resource_data['nat']]['vpc'] + '_'
 
         if rule_type == 'dnat':
-            subnet += clean_str(rule_data['dnat_subnet_name'])
+            subnet += clean_str(resource_data['dnat_subnet_name'])
         else:
-            dest = rule_data['snat_cidr_subnet'].strip()
+            dest = resource_data['snat_cidr_subnet'].strip()
 
             if re.match(r'(\d{1,3}\.){3}\d{1,3}\/\d{1,2}', dest) is not None:
-                rule_data['cidr'] = dest
+                resource_data['cidr'] = dest
             else:
                 subnet += clean_str(dest)
 
-        rule_data['subnet'] = subnet
+        resource_data['subnet'] = subnet
 
-        rule_data['_id'] = self._next_id
-        rule_data['rule'] = f'{rule_data["nat"]}_{rule_type}_'
-        rule_data['rule'] += f'rule{self._next_id:02}'
+        resource_data['_id'] = self._next_id
+        resource_data['rule'] = f'{resource_data["nat"]}_{rule_type}_'
+        resource_data['rule'] += f'rule{self._next_id:02}'
 
         self._next_id += 1
 
-        return super()._parse(rule_data)
+        return super()._parse(resource_data)
 
-    def _validate(self, rule_data: dict):
-        error_msg = None
-
-        rule_type = rule_data['rule_type']
+    def _validate(self, resource_data: dict, error_msg: str | None = None):
+        rule_type = resource_data['rule_type']
         if rule_type not in ['dnat', 'snat']:
             error_msg = f'Rule Type must be DNAT or SNAT ({rule_type})'
 
-        return super()._validate(rule_data, error_msg)
+        return super()._validate(resource_data, error_msg)

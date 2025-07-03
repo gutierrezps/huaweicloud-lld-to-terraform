@@ -13,11 +13,12 @@ class Evs2Terraform(Resource2Terraform):
         super().__init__(template_name='evs', key_attr='evs_name')
         self._ecs_attachments: dict[str, list] = {}
 
-    def add(self, ecs_data: dict):
+    def add(self, resource_data: dict):
+        ecs_data = resource_data
         ecs_disks = {}
 
         for i_disk in self.DATA_DISK_IDS:
-            evs_data = self._parse(ecs_data, i_disk)
+            evs_data = self._parse_evs(ecs_data, i_disk)
             if evs_data is None:
                 break
 
@@ -38,11 +39,10 @@ class Evs2Terraform(Resource2Terraform):
                 self._resources_data[evs['evs_name']] = evs
             self._ecs_attachments[ecs_data['ecs_name']].append(evs)
 
-    def _validate(self, disk_data: dict):
-        error_msg = None
-        i_disk = disk_data['i_disk']
+    def _validate(self, resource_data: dict, error_msg: str | None = None):
+        i_disk = resource_data['i_disk']
 
-        disk_size = disk_data.get('size', 0)
+        disk_size = resource_data.get('size', 0)
         if disk_size < 10:
             msg = f'data disk {i_disk} size < 10GB ({disk_size})'
             raise ValueError(msg)
@@ -50,7 +50,7 @@ class Evs2Terraform(Resource2Terraform):
         # type, size and shared should be specified for each data disk,
         # check if there is any of those values missing
         missing_params = set(self.DISK_PARAMS)
-        missing_params -= set(disk_data.keys())
+        missing_params -= set(resource_data.keys())
         if missing_params:
             msg = f'data disk {i_disk} has missing params: '
             msg += f'{list(missing_params)[0]}'
@@ -58,7 +58,7 @@ class Evs2Terraform(Resource2Terraform):
 
         return error_msg
 
-    def _parse(self, ecs_data: dict, i_disk: int):
+    def _parse_evs(self, ecs_data: dict, i_disk: int):
         evs_data = {}
 
         # extract values for each param

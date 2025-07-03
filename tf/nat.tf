@@ -32,3 +32,4 @@ resource "huaweicloud_nat_snat_rule" "nat_gw_snat_rule02" {
   description     = ""
   subnet_id       = huaweicloud_vpc_subnet.dev_dev01.id
 }
+

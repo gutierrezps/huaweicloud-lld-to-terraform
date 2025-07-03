@@ -11,6 +11,7 @@ class Nat2Terraform(Resource2Terraform):
             'project': 'enterprise_project'
         }
 
-    def _parse(self, nat_data: dict):
-        nat_data['subnet'] = nat_data['vpc'] + '_' + nat_data['subnet']
-        return super()._parse(nat_data)
+    def _parse(self, resource_data: dict):
+        subnet = resource_data['vpc'] + '_' + resource_data['subnet']
+        resource_data['subnet'] = subnet
+        return super()._parse(resource_data)

@@ -9,8 +9,8 @@ class Subnet2Terraform(Resource2Terraform):
             'vpc': 'vpc_name'
         }
 
-    def _parse(self, subnet_data: dict):
-        subnet = f"{subnet_data['vpc']}_{subnet_data['subnet']}"
-        subnet_data['subnet'] = subnet
+    def _parse(self, resource_data: dict):
+        subnet = f"{resource_data['vpc']}_{resource_data['subnet']}"
+        resource_data['subnet'] = subnet
 
-        return super()._parse(subnet_data)
+        return super()._parse(resource_data)
