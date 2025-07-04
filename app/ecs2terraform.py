@@ -116,7 +116,7 @@ class Ecs2Terraform(Resource2Terraform):
 
         return None
 
-    def _servergroups_to_tfcode(self):
+    def _servergroups_to_terraform(self, output_file: TextIOWrapper):
         """Transforms server Groups to Terraform code.
 
         Example input data:
@@ -130,20 +130,15 @@ class Ecs2Terraform(Resource2Terraform):
         Args:
             servergroups (dict): key is the group name, and value is the
                 list of ecs_names
-
-        Returns:
-            str: Terraform code for all server groups
         """
-        tf_code = ''
         renderer = Renderer()
 
         for data in self._servergroups.values():
-            tf_code += renderer.render_name('templates/servergroup', data)
+            tf_code = renderer.render_name('templates/servergroup', data)
             tf_code += '\n'
+            output_file.write(tf_code)
 
-        return tf_code
-
-    def output_terraform_code(self, output_file: TextIOWrapper):
+    def to_terraform(self, output_file: TextIOWrapper):
         """Transforms all ECS data into Terraform code, and save to
         tf/ecs.tf.
 
@@ -162,8 +157,8 @@ class Ecs2Terraform(Resource2Terraform):
             tf_code += '\n'
             output_file.write(tf_code)
 
-        output_file.write(self._servergroups_to_tfcode())
+        self._servergroups_to_terraform(output_file)
 
-        output_file.write(self._nics_handler.terraform_code())
+        self._nics_handler.to_terraform(output_file)
 
         self._evs_handler.to_terraform(output_file)

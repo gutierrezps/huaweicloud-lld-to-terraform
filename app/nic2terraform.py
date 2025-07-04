@@ -1,4 +1,5 @@
 import re
+from io import TextIOWrapper
 
 from pystache import Renderer
 
@@ -99,8 +100,8 @@ class Nic2Terraform(Resource2Terraform):
             self._virtual_ips[vip_addr]['hosts'].append(ecs_data['ecs_name'])
             self._ips_with_virtual_ip[ecs_data[nic_fixed_ip_key]] = vip_addr
 
-    def _nics_to_tfcode(self, ecs_name, renderer):
-        tf_code = ''
+    def _nics_to_terraform(self, ecs_name: str, output_file: TextIOWrapper):
+        renderer = Renderer()
         next_depends_on = None
 
         for nic_data in self._resources_data[ecs_name]:
@@ -116,16 +117,15 @@ class Nic2Terraform(Resource2Terraform):
             nic_has_vip = self.has_vip(nic_data['fixed_ip'])
             nic_data['source_dest_check'] = str(not nic_has_vip).lower()
 
-            tf_code += renderer.render_name('templates/nic', nic_data)
+            tf_code = renderer.render_name('templates/nic', nic_data)
             tf_code += '\n'
+            output_file.write(tf_code)
 
             next_depends_on = f"{ nic_data['ecs_name'] }_"
             next_depends_on += f"{ nic_data['subnet'] }"
 
-        return tf_code
-
-    def _vips_to_tfcode(self, renderer) -> str:
-        tf_code = ''
+    def _vips_to_terraform(self, output_file: TextIOWrapper):
+        renderer = Renderer()
 
         for vip_data in self._virtual_ips.values():
             ports = []
@@ -148,10 +148,9 @@ class Nic2Terraform(Resource2Terraform):
             # transform array into string and preserve tf_code indentation
             vip_data['ports'] = ',\n    '.join(ports)
 
-            tf_code += renderer.render_name('templates/vip', vip_data)
+            tf_code = renderer.render_name('templates/vip', vip_data)
             tf_code += '\n'
-
-        return tf_code
+            output_file.write(tf_code)
 
     def has_vip(self, fixed_ip: str) -> bool:
         return fixed_ip in self._ips_with_virtual_ip
@@ -163,13 +162,14 @@ class Nic2Terraform(Resource2Terraform):
             ]
         return secgroups
 
-    def terraform_code(self):
-        renderer = Renderer()
-        tf_code = ''
+    def to_terraform(self, output_file: TextIOWrapper):
+        """Transforms all ECS data into Terraform code, and save to
+        tf/ecs.tf.
 
+        Args:
+            output_file (TextIOWrapper): file to write the tf code
+        """
         for ecs_name in self._resources_data.keys():
-            tf_code += self._nics_to_tfcode(ecs_name, renderer)
+            self._nics_to_terraform(ecs_name, output_file)
 
-        tf_code += self._vips_to_tfcode(renderer)
-
-        return tf_code
+        self._vips_to_terraform(output_file)

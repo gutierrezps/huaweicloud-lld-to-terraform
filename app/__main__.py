@@ -45,7 +45,7 @@ def process_ecs(worksheet: Worksheet, last_wave: int):
     process_sheet_data(worksheet.title, data, ecs_handler.add)
 
     with open('tf/ecs.tf', 'w') as output_file:
-        ecs_handler.output_terraform_code(output_file)
+        ecs_handler.to_terraform(output_file)
 
 
 def process_vpc(worksheet: Worksheet):
