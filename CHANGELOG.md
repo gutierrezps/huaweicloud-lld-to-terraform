@@ -1,5 +1,11 @@
 # Changelog
 
+## [Unreleased]
+
+- Updated Terraform provider version to 1.76.1;
+- Refactor Python automation to reduce code repetition (now using
+  Resource2Terraform as base class).
+
 ## [0.4.0] - 2024-08-19
 
 - **LLD**: Add EIP, NAT Gateway and NAT rules support;
