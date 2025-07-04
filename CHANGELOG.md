@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- **LLD**: Add RDS support;
+- **metadata**: Renamed "ECS last wave" to "Resource last wave";
 - Updated Terraform provider version to 1.76.1;
 - Refactor Python automation to reduce code repetition (now using
   Resource2Terraform as base class).

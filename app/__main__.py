@@ -9,6 +9,7 @@ from .eip2terraform import Eip2Terraform
 from .enterpriseproj2terraform import EnterpriseProj2Terraform
 from .nat2terraform import Nat2Terraform
 from .natrule2terraform import NatRule2Terraform
+from .rds2terraform import Rds2Terraform
 from .secgroup2terraform import Secgroup2Terraform
 from .subnet2terraform import Subnet2Terraform
 from .utils import load_metadata, load_sheet_data
@@ -129,17 +130,28 @@ def process_enterpriseproj(worksheet: Worksheet):
         project_handler.to_terraform(output_file)
 
 
+def process_rds(worksheet: Worksheet):
+    data = load_sheet_data(worksheet)
+
+    rds_handler = Rds2Terraform()
+
+    process_sheet_data(worksheet.title, data, rds_handler.add)
+
+    with open('tf/rds.tf', 'w') as output_file:
+        rds_handler.to_terraform(output_file)
+
+
 def main():
     metadata = load_metadata(METADATA_FILENAME)
     workbook = load_workbook(LLD_FILENAME, data_only=True)
 
-    # load and validate "ECS last wave"
+    # load and validate "Resource last wave"
     last_wave = 0
     try:
-        last_wave = int(metadata['ecs_last_wave'])
+        last_wave = int(metadata['resource_last_wave'])
         assert last_wave > 0
     except (ValueError, AssertionError):
-        print('[ERR] Invalid ECS last wave value (must be a number > 0)')
+        print('[ERR] Invalid Resource last wave value (must be a number > 0)')
 
     process_ecs(workbook[metadata['ecs_sheet']], last_wave)
 
@@ -156,6 +168,8 @@ def main():
     process_nat_rules(workbook[metadata['nat_rules_sheet']], nat_data)
 
     process_enterpriseproj(workbook[metadata['enterprise_proj_sheet']])
+
+    process_rds(workbook[metadata['rds_sheet']])
 
 
 if __name__ == '__main__':

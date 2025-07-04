@@ -86,7 +86,7 @@ class Ecs2Terraform(Resource2Terraform):
         ecs_name = resource_data['ecs_name']
 
         # ECSs will be ignored if "Wave" value is not set, if it's
-        # negative or if it's greather than "ECS last wave"
+        # negative or if it's greather than "Resource last wave"
         # in metadata.xlsx
         ecs_wave = resource_data.pop('wave', 0)
         if ecs_wave <= 0 or ecs_wave > self._last_wave:

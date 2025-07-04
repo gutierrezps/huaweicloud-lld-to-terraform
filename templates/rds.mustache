@@ -1,0 +1,35 @@
+data "huaweicloud_rds_flavors" "{{ rds }}" {
+  region        = "{{ region }}"
+  db_type       = "{{ db_engine }}"
+  db_version    = "{{ db_engine_version }}"
+  instance_mode = "{{ db_instance_mode }}"
+  vcpus         = "{{ vcpus }}"
+  memory        = "{{ memory_gb }}"
+  group_type    = "{{ instance_class }}"
+}
+
+resource "huaweicloud_rds_instance" "{{ rds }}" {
+  name              = "{{ rds_name }}"
+  flavor            = one(data.huaweicloud_rds_flavors.{{ rds }}.flavors).name
+  vpc_id            = huaweicloud_vpc.{{ vpc_name }}.id
+  subnet_id         = huaweicloud_vpc_subnet.{{ subnet }}.id
+  security_group_id = huaweicloud_networking_secgroup.{{ secgroup }}.id
+  availability_zone = ["{{{ availability_zones }}}"]
+  {{#ha_replication}}
+  ha_replication_mode = "{{ ha_replication }}"
+  {{/ha_replication}}
+  {{#project}}
+  enterprise_project_id = data.huaweicloud_enterprise_project.ep_{{ project }}.id
+  {{/project}}
+
+  db {
+    type     = "{{ db_engine }}"
+    version  = "{{ db_engine_version }}"
+    password = "{{ password }}"
+  }
+
+  volume {
+    type = "CLOUDSSD"
+    size = {{ storage_size }}
+  }
+}

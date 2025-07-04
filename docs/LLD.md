@@ -20,6 +20,8 @@ and the associated arguments reference.
     - [NAT Rules Argument Reference](#nat-rules-argument-reference)
   - [Elastic Cloud Server (ECS)](#elastic-cloud-server-ecs)
     - [ECS Argument Reference](#ecs-argument-reference)
+  - [Relational Database Service (RDS)](#relational-database-service-rds)
+    - [RDS Argument Reference](#rds-argument-reference)
 
 ## General orientations
 
@@ -304,7 +306,7 @@ Each row of the spreadsheet corresponds to one ECS.
   hyphens (-), and periods (.).
 - **Wave** - (required) Integer value, controls if the Terraform code for the
   ECS and associated EVSs will be generated or not. If the wave number is zero,
-  negative or greater than the "ECS last wave" value set in the
+  negative or greater than the "Resource last wave" value set in the
   **metadata.xlsx** spreadsheet, the Terraform code will not be generated.
 - **ECS Group** - (optional, resource name, force new) Name of the server
   group where the instance will be placed. A [server group][ecs-group] with
@@ -384,6 +386,65 @@ always following the same pattern. Data disks are optional.
   considered to be shared between the ECSs in the same server group (argument
   **ECS Group**).
 
+## Relational Database Service (RDS)
+
+The [Relational Database Service (RDS)][rds] is a cloud-based web service that
+is reliable, scalable, easy to manage, and ready for immediate use.
+
+Each row of the spreadsheet corresponds to one RDS instance.
+
+### RDS Argument Reference
+
+- **SN** - (optional, not used) Serial number, only for reference.
+- **Region** - (required, force new) Region code (e.g. `sa-brazil-1`) in which
+  to create the RDS. See [Regions and Endpoints][endpoints] to get the desired
+  region code. Changing this creates a new RDS.
+- **RDS Name** - (required, resource name) Name of the RDS, must be unique for
+  the account. The value is a string of no more than 64 characters and can
+  contain digits, letters, underscores (_), and hyphens (-).
+- **Wave** - (required) Integer value, controls if the Terraform code for the
+  RDS will be generated or not. If the wave number is zero, negative or greater
+  than the "Resource last wave" value set in the **metadata.xlsx** spreadsheet,
+  the Terraform code will not be generated.
+- **vCPUs** - (required) Integer value, specifies the number of vCPUs in the
+  RDS flavor.
+- **Memory GB** - (required) Integer value, specifies the memory size (GB) in
+  the RDS flavor.
+- **Instance Class** - (required) Specifies the performance specification, the
+  valid values are `general` and `dedicated`.
+- **DB Engine** - (required) Specifies the DB engine. The value can be `MySQL`
+  and `PostgreSQL`.
+- **DB Engine Version** - (required) Specifies the database version.
+- **DB Instance Mode** - (required) Specifies the mode of instance. The value
+  can be `single` (single instance) or `ha` (primary/standby instance).
+- **Password** - (required) Specifies the database password. The value should
+  contain 8 to 32 characters, including uppercase and lowercase letters, digits,
+  and the following special characters: `~!@#%^*-_=+?` You are advised to enter
+  a strong password to improve security, preventing security risks such as
+  brute force cracking.
+- **Primary AZ** - (required) Availability Zone code (e.g. `sa-brazil-1a`)
+  in which to create the primary instance (or single instance). See
+  [Regions and Endpoints][endpoints] to get the desired availability zone code.
+- **Standby AZ** - (optional) Availability Zone code (e.g. `sa-brazil-1a`)
+  in which to create the standby instance. See [Regions and Endpoints][endpoints]
+  to get the desired availability zone code. This parameter is mandatory when
+  **DB Instance Mode** is set to `ha`.
+- **Storage Size** - (required) Integer value, specifies the volume size. Its
+  value range is from 40 GB to 4000 GB. The value must be a multiple of 10.
+- **VPC Name** - (required, force new) Name of the VPC specified in the
+  associated spreadsheet tab. Changing this creates a new RDS instance.
+- **Subnet Name** - (required, force new) Name of the subnet specified in the
+  associated spreadsheet tab. Changing this creates a new RDS instance.
+- **Security Group** - (required) Name of the security group specified in the
+  associated spreadsheet tab.
+- **Enterprise Project** - (optional, force new) Name of enterprise project
+  where RDS will be created. If this argument is set, the enterprise project
+  must be specified in the associated spreadsheet tab. Changing this creates
+  a new RDS.
+- **Description** - (optional) Supplementary information about the RDS. The
+  value can be a string of no more than 255 characters and cannot contain
+  angle brackets (< or >).
+
 [tf-state-mv]: <https://developer.hashicorp.com/terraform/cli/commands/state/mv>
 [tf-moved]: <https://developer.hashicorp.com/terraform/tutorials/configuration-language/move-config>
 [eps]: <https://support.huaweicloud.com/intl/en-us/usermanual-em/em_eps_01_0000.html>
@@ -399,3 +460,4 @@ always following the same pattern. Data disks are optional.
 [vip]: <https://support.huaweicloud.com/intl/en-us/productdesc-vpc/vpc_Concepts_0012.html>
 [eip]: <https://support.huaweicloud.com/intl/en-us/productdesc-eip/overview_0001.html>
 [nat]: <https://support.huaweicloud.com/intl/en-us/productdesc-natgateway/en-us_topic_0086739762.html>
+[rds]: <https://support.huaweicloud.com/intl/en-us/productdesc-rds/en-us_topic_dashboard.html>
